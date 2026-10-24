@@ -9,7 +9,7 @@ const params = new URLSearchParams(window.location.search);
 const village = findVillage(params.get('ort')) ?? defaultVillage();
 if (village) {
   document.title = `HalloweenMap ${village.name}`;
-  renderMapPage(root, village);
+  renderMapPage(root, village, params.get('loeschen'));
 } else {
   renderVillageSelectPage(root);
 }

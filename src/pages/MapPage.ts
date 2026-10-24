@@ -1,12 +1,14 @@
 import type { Village } from '../config/villages';
 import { createMap } from '../components/map';
+import { openDeleteDialog } from '../components/deleteDialog';
 import { openEntryForm } from '../components/entryForm';
 import { showToast } from '../components/toast';
-import { fetchEntries } from '../lib/supabase/entries';
+import { fetchEntries, getEntryByToken } from '../lib/supabase/entries';
+import { tokenFor } from '../lib/token';
 import type { Entry } from '../lib/types';
 import { h } from '../lib/dom';
 
-export function renderMapPage(root: HTMLElement, village: Village): void {
+export function renderMapPage(root: HTMLElement, village: Village, deleteToken?: string | null): void {
   root.replaceChildren();
   const mapEl = h('div', { class: 'map', id: 'map' });
   const header = h(
@@ -17,8 +19,27 @@ export function renderMapPage(root: HTMLElement, village: Village): void {
   );
   root.append(mapEl, header);
 
-  const map = createMap(mapEl, village);
   let entries: Entry[] = [];
+
+  function onDeleted(id: string) {
+    entries = entries.filter((e) => e.id !== id);
+    map.setEntries(entries);
+    showToast('Dein Eintrag wurde gelöscht.');
+  }
+
+  const map = createMap(mapEl, village, {
+    // Eigene Einträge (Token in diesem Browser bekannt) bekommen im Popup einen Löschen-Button
+    popupExtras(entry) {
+      const token = tokenFor(entry.id);
+      if (!token) return null;
+      const btn = h('button', { type: 'button', class: 'btn danger small' }, 'Meinen Eintrag löschen');
+      btn.addEventListener('click', () => {
+        map.map.closePopup();
+        openDeleteDialog(entry, token, () => onDeleted(entry.id));
+      });
+      return btn;
+    },
+  });
 
   async function load() {
     try {
@@ -41,4 +62,23 @@ export function renderMapPage(root: HTMLElement, village: Village): void {
   root.append(addBtn);
 
   void load();
+  if (deleteToken) void startDeleteFlow(deleteToken);
+
+  /** Löschlink (?loeschen=<token>): Eintrag nachschlagen und Bestätigungsdialog zeigen. */
+  async function startDeleteFlow(token: string) {
+    // Token aus der Adresszeile entfernen, damit er nicht versehentlich weitergeteilt wird
+    const url = new URL(window.location.href);
+    url.searchParams.delete('loeschen');
+    history.replaceState(null, '', url);
+    try {
+      const entry = await getEntryByToken(token);
+      if (!entry || entry.village_slug !== village.slug) {
+        showToast('Dieser Eintrag existiert nicht (mehr). Der Löschlink ist nicht mehr gültig.');
+        return;
+      }
+      openDeleteDialog(entry, token, () => onDeleted(entry.id));
+    } catch {
+      showToast('Der Löschlink konnte nicht geprüft werden. Bitte versuche es später erneut.');
+    }
+  }
 }

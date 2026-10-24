@@ -53,3 +53,24 @@ export class SupabaseRpcError extends Error {
     super(message);
   }
 }
+
+export interface OwnEntry {
+  id: string;
+  village_slug: string;
+  address_label: string;
+  note: string | null;
+}
+
+/** Sucht den Eintrag zu einem Löschtoken (für den Löschlink). `null`, wenn es ihn nicht (mehr) gibt. */
+export async function getEntryByToken(token: string): Promise<OwnEntry | null> {
+  const { data, error } = await requireSupabase().rpc('get_entry_by_token', { p_token: token });
+  if (error) throw new SupabaseRpcError(error.message, error.code);
+  return (data as OwnEntry[])[0] ?? null;
+}
+
+/** Löscht einen Eintrag mit seinem Token. `false`, wenn Token und Eintrag nicht zusammenpassen. */
+export async function deleteEntry(entryId: string, token: string): Promise<boolean> {
+  const { data, error } = await requireSupabase().rpc('delete_entry', { p_entry_id: entryId, p_token: token });
+  if (error) throw new SupabaseRpcError(error.message, error.code);
+  return data as boolean;
+}
