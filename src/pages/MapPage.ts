@@ -99,7 +99,7 @@ function infoContent(village: Village): HTMLElement {
       h('li', {}, 'Gespeichert werden nur Adresse (Strasse und Nr.) und ein optionaler Hinweis, kein Name.'),
       h('li', {}, 'Beides ist öffentlich auf der Karte sichtbar.'),
       h('li', {}, 'Du kannst deinen Eintrag jederzeit mit deinem persönlichen Löschlink entfernen.'),
-      h('li', {}, 'Einträge werden nach Halloween automatisch gelöscht.'),
+      h('li', {}, 'Dein Eintrag bleibt gespeichert, bis du ihn widerrufst (z. B. für das nächste Jahr).'),
     ),
   );
 }
