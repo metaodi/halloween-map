@@ -19,11 +19,11 @@ export interface Village {
 export const villages: Village[] = [
   {
     // Platzhalter – Werte bitte anpassen
-    slug: 'pfnuselkueste',
-    name: 'Pfnüselküste',
-    center: [47.3, 8.62],
+    slug: 'richterswil',
+    name: 'Richterswil',
+    center: [47.2010, 8.6994],
     zoom: 14,
-    bbox: [8.55, 47.25, 8.72, 47.35],
+    bbox: [8.678, 47.181, 8.71, 47.224],
     eventDate: '2026-10-31',
     welcomeText: 'Hier siehst du, wo an Halloween Trick-or-Treat erwünscht ist.',
   },
