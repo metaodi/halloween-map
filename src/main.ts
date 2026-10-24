@@ -7,7 +7,7 @@ import { renderVillageSelectPage } from './pages/VillageSelectPage';
 const root = document.getElementById('app')!;
 const params = new URLSearchParams(window.location.search);
 
-if (window.location.pathname.replace(/\/+$/, '') === '/admin') {
+if (params.has('admin')) {
   void renderAdminPage(root);
 } else {
   const village = findVillage(params.get('ort')) ?? defaultVillage();

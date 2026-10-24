@@ -1,6 +1,6 @@
 # 🎃 HalloweenMap
 
-Trick-or-Treat-Karte für Dörfer und Quartiere: Familien tragen ihre Adresse selbst ein und erscheinen mit einem 🎃-Marker. Gebaut mit Vite, TypeScript (ohne UI-Framework), Leaflet/OpenStreetMap und Supabase. Das Frontend ist rein statisch.
+Trick-or-Treat-Karte für Dörfer und Quartiere: Familien tragen ihre Adresse selbst ein und erscheinen mit einem 🎃-Marker. Gebaut mit Vite, TypeScript (ohne UI-Framework), Leaflet/OpenStreetMap und Supabase. Das Frontend ist rein statisch und wird über GitHub Pages ausgeliefert.
 
 ## Voraussetzungen
 
@@ -47,11 +47,11 @@ Ohne Supabase-Variablen zeigt die Karte beim lokalen Entwickeln Demo-Einträge; 
 npm install
 npm run dev        # http://localhost:5173
 npm test           # Vitest
-npm run build      # Produktions-Build nach dist/
+npm run build      # Produktions-Build nach dist/ (VITE_BASE für Unterpfad, z. B. /halloween-map/)
 ```
 
 - Karte: `http://localhost:5173/?ort=<slug>`
-- Admin: `http://localhost:5173/admin`
+- Admin: `http://localhost:5173/?admin`
 - Löschlink: `/?ort=<slug>&loeschen=<token>`
 
 ## Neuen Ort hinzufügen
@@ -74,12 +74,20 @@ Die `bbox` begrenzt die Adresssuche und lehnt Treffer ausserhalb ab. Der erste E
 
 > Die Datenbank kennt die Orte nicht, sie prüft nur das Slug-Format. Orte ausserhalb der Schweiz erfordern eine Anpassung der Koordinaten-Plausibilität in `create_entry`.
 
-## Deployment (Cloudflare Pages)
+## Deployment (GitHub Pages)
 
-1. Repository in Cloudflare Pages verbinden (*Workers & Pages → Create → Pages → Connect to Git*).
-2. Build command: `npm run build`, Output directory: `dist`.
-3. Unter *Settings → Environment variables* die vier `VITE_…`-Variablen setzen.
-4. `/admin` ist eine Client-Route: Cloudflare Pages liefert dafür `index.html` automatisch, `public/_redirects` deckt Netlify ab. Bei GitHub Pages `dist/index.html` zusätzlich als `404.html` kopieren.
+Der Workflow `.github/workflows/deploy.yml` baut bei jedem Push auf `main` (und manuell über *Actions → Run workflow*) und veröffentlicht `dist/` auf GitHub Pages.
+
+1. **Pages aktivieren:** *Settings → Pages → Build and deployment → Source: «GitHub Actions»*.
+2. **Variablen setzen:** *Settings → Secrets and variables → Actions → Variables* (Reiter *Variables*, nicht *Secrets*; der anon key ist ohnehin öffentlich):
+   `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_DEFAULT_VILLAGE`, `VITE_GEOCODER`.
+3. **Deployen:** Auf `main` pushen bzw. mergen. Die Seite erscheint unter `https://<user>.github.io/<repo>/`.
+
+Hinweise:
+
+- Der Workflow setzt `VITE_BASE=/<repo>/` automatisch. Bei einer eigenen Domain oder einer User-Seite (`<user>.github.io`) im Workflow `VITE_BASE: /` setzen.
+- GitHub Pages kennt keine Rewrites. Deshalb ist der Admin-Bereich über `?admin` erreichbar (`https://<user>.github.io/<repo>/?admin`) statt über einen Pfad.
+- Supabase: Unter *Authentication → URL Configuration* die Pages-URL als *Site URL* eintragen.
 
 ## Automatisches Löschen nach Halloween
 
