@@ -11,6 +11,10 @@ export interface MapHandle {
   openPopup(entryId: string): void;
   /** Zoomt auf alle Einträge, ohne Einträge auf die Mitte des Orts. */
   fit(entries: Entry[], fallback: Village): void;
+  /** Zeigt die eigene Position (Punkt + Genauigkeitskreis) an. */
+  setUserLocation(lat: number, lng: number, accuracy: number): void;
+  /** Zentriert die Karte auf die zuletzt bekannte eigene Position; false, wenn keine bekannt ist. */
+  centerOnUser(): boolean;
 }
 
 export interface MapOptions {
@@ -49,8 +53,29 @@ export function createMap(container: HTMLElement, village: Village, options: Map
     return root;
   }
 
+  let userDot: L.CircleMarker | null = null;
+  let userAccuracy: L.Circle | null = null;
+  let userLatLng: L.LatLng | null = null;
+
   return {
     map,
+    setUserLocation(lat, lng, accuracy) {
+      userLatLng = L.latLng(lat, lng);
+      if (!userDot || !userAccuracy) {
+        userAccuracy = L.circle(userLatLng, { radius: accuracy, interactive: false, weight: 1, color: '#2563eb', fillOpacity: 0.12 }).addTo(map);
+        userDot = L.circleMarker(userLatLng, {
+          radius: 8, weight: 3, color: '#fff', fillColor: '#2563eb', fillOpacity: 1, interactive: false,
+        }).addTo(map);
+      } else {
+        userAccuracy.setLatLng(userLatLng).setRadius(accuracy);
+        userDot.setLatLng(userLatLng);
+      }
+    },
+    centerOnUser() {
+      if (!userLatLng) return false;
+      map.setView(userLatLng, Math.max(map.getZoom(), 17));
+      return true;
+    },
     setEntries(entries) {
       layer.clearLayers();
       markers.clear();

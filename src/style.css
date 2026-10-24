@@ -124,3 +124,9 @@ dialog.modal::backdrop { background: rgba(10, 5, 25, 0.6); }
 
 .info-btn { position: fixed; z-index: 600; right: 12px; top: calc(env(safe-area-inset-top) + 8px); min-height: 40px; padding: 0 12px; }
 .topbar { padding-right: 100px; }
+
+.map-actions {
+  position: fixed; z-index: 600; right: 12px; top: calc(env(safe-area-inset-top) + 60px);
+  display: grid; gap: 8px;
+}
+.map-btn { min-width: 44px; padding: 0; font-size: 1.3rem; box-shadow: var(--shadow); }

@@ -42,14 +42,56 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
     },
   });
 
-  async function load() {
+  async function load(manual = false) {
+    reloadBtn.disabled = true;
     try {
       entries = await fetchEntries(village);
       map.setEntries(entries);
+      if (manual) showToast('Einträge aktualisiert.');
     } catch {
-      showToast('Die Einträge konnten nicht geladen werden. Bitte Seite neu laden.');
+      showToast('Die Einträge konnten nicht geladen werden. Bitte versuche es erneut.');
+    } finally {
+      reloadBtn.disabled = false;
     }
   }
+
+  const reloadBtn = h('button', { type: 'button', class: 'btn secondary map-btn', 'aria-label': 'Einträge neu laden', title: 'Einträge neu laden' }, '🔄');
+  reloadBtn.addEventListener('click', () => void load(true));
+
+  // Eigene Position: wird erst nach dem ersten Klick abgefragt (Berechtigungsdialog nur auf Wunsch)
+  let watchId: number | null = null;
+  let centerOnFirstFix = false;
+  const locateBtn = h('button', { type: 'button', class: 'btn secondary map-btn', 'aria-label': 'Auf meine Position zentrieren', title: 'Auf meine Position zentrieren' }, '📍');
+  locateBtn.addEventListener('click', () => {
+    if (!('geolocation' in navigator)) {
+      showToast('Dein Gerät unterstützt keine Standortbestimmung.');
+      return;
+    }
+    if (watchId !== null) {
+      if (!map.centerOnUser()) showToast('Position wird noch bestimmt …');
+      return;
+    }
+    centerOnFirstFix = true;
+    watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        map.setUserLocation(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+        if (centerOnFirstFix) {
+          centerOnFirstFix = false;
+          map.centerOnUser();
+        }
+      },
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED && watchId !== null) {
+          navigator.geolocation.clearWatch(watchId);
+          watchId = null;
+          showToast('Standortzugriff verweigert. Bitte erlaube ihn in den Browser-Einstellungen.');
+        } else if (err.code !== err.PERMISSION_DENIED) {
+          showToast('Deine Position konnte nicht bestimmt werden.');
+        }
+      },
+      { enableHighAccuracy: true, maximumAge: 10_000, timeout: 20_000 },
+    );
+  });
 
   const addBtn = h('button', { type: 'button', class: 'btn fab' }, '🎃 Meine Adresse eintragen');
   addBtn.addEventListener('click', () =>
@@ -62,7 +104,7 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
   );
   const infoBtn = h('button', { type: 'button', class: 'btn secondary info-btn', 'aria-label': 'Info und Datenschutz' }, 'ℹ️ Info');
   infoBtn.addEventListener('click', () => openDialog('Info und Datenschutz', infoContent(village)));
-  root.append(addBtn, infoBtn);
+  root.append(addBtn, infoBtn, h('div', { class: 'map-actions' }, reloadBtn, locateBtn));
 
   void load();
   if (deleteToken) void startDeleteFlow(deleteToken);
