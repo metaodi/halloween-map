@@ -29,9 +29,13 @@ const pumpkinIcon = L.divIcon({
 export function createMap(container: HTMLElement, village: Village, options: MapOptions = {}): MapHandle {
   const map = L.map(container, { zoomControl: false }).setView(village.center, village.zoom);
   L.control.zoom({ position: 'bottomright' }).addTo(map);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende',
+  // «Swiss style» von OSM Switzerland (wie in uMap)
+  L.tileLayer('https://tile.osm.ch/switzerland/{z}/{x}/{y}.png', {
+    maxZoom: 21,
+    maxNativeZoom: 18,
+    attribution:
+      '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>-Mitwirkende, ' +
+      'Style <a href="https://osm.ch">OSM Switzerland</a>',
   }).addTo(map);
 
   const layer = L.layerGroup().addTo(map);
