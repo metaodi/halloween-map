@@ -12,7 +12,7 @@ export function renderVillageSelectPage(root: HTMLElement): void {
         'ul',
         { class: 'village-list' },
         ...villages.map((v) =>
-          h('li', {}, h('a', { class: 'btn', href: `/?ort=${encodeURIComponent(v.slug)}` }, v.name)),
+          h('li', {}, h('a', { class: 'btn', href: `${import.meta.env.BASE_URL}?ort=${encodeURIComponent(v.slug)}` }, v.name)),
         ),
       ),
     ),

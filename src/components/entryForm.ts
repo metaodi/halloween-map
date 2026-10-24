@@ -19,7 +19,7 @@ export interface CreatedEntry {
 }
 
 export function deleteLinkFor(village: Village, token: string): string {
-  const url = new URL(window.location.origin + '/');
+  const url = new URL(import.meta.env.BASE_URL, window.location.origin);
   url.searchParams.set('ort', village.slug);
   url.searchParams.set('loeschen', token);
   return url.toString();
