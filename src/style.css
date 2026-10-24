@@ -1,0 +1,57 @@
+:root {
+  --bg: #1b1230;
+  --surface: #ffffff;
+  --text: #1f1a2b;
+  --muted: #5b5470;
+  --accent: #e8590c;       /* Kontrast auf Weiss 3.9:1 – nur für grosse Flächen mit dunklem Text */
+  --accent-strong: #b84300; /* Kontrast mit Weiss 5.4:1 */
+  --danger: #b42318;
+  --border: #d4cfe0;
+  --radius: 12px;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+}
+
+* { box-sizing: border-box; }
+html, body, #app { height: 100%; margin: 0; }
+body { background: var(--bg); }
+
+:focus-visible { outline: 3px solid #2563eb; outline-offset: 2px; }
+
+.map { position: fixed; inset: 0; }
+
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  padding: calc(env(safe-area-inset-top) + 8px) 16px 10px;
+  background: rgba(27, 18, 48, 0.92); color: #fff;
+  pointer-events: none;
+}
+.topbar h1 { margin: 0; font-size: 1.2rem; }
+.topbar p { margin: 2px 0 0; font-size: 0.85rem; color: #e5defa; }
+
+.pumpkin-marker { background: none; border: none; }
+.pumpkin-marker span {
+  display: flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; font-size: 32px; line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+.popup { font-size: 0.95rem; }
+.popup-note { margin: 6px 0 0; color: var(--muted); }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  min-height: 44px; padding: 0 18px; border: 0; border-radius: var(--radius);
+  background: var(--accent-strong); color: #fff; font: inherit; font-weight: 600;
+  text-decoration: none; cursor: pointer;
+}
+.btn:hover { background: #9c3800; }
+.btn.secondary { background: #fff; color: var(--text); border: 1px solid var(--border); }
+.btn.danger { background: var(--danger); }
+.btn[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+.page { min-height: 100%; padding: 24px 16px; background: #f6f3fb; }
+.page.narrow { max-width: 480px; margin: 0 auto; }
+.village-list { list-style: none; padding: 0; display: grid; gap: 12px; }
