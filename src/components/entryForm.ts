@@ -8,6 +8,7 @@ import { openDialog } from './dialog';
 
 const NOTE_MAX = 140;
 const RATE_LIMIT_CODE = '54000';
+const INVALID_PARAMETER_CODE = '22023';
 
 export interface CreatedEntry {
   id: string;
@@ -97,10 +98,13 @@ export function openEntryForm(village: Village, onCreated: (entry: CreatedEntry)
           note: noteValue,
           token,
         }).catch((err: unknown) => {
+          console.error('Eintrag konnte nicht gespeichert werden', err);
           error.textContent =
             err instanceof SupabaseRpcError && err.code === RATE_LIMIT_CODE
               ? 'Gerade werden viele Einträge erfasst. Bitte versuche es in einer Minute erneut.'
-              : 'Der Eintrag konnte nicht gespeichert werden. Bitte versuche es später erneut.';
+              : err instanceof SupabaseRpcError && err.code === INVALID_PARAMETER_CODE
+                ? 'Die Adresse wurde vom Server abgelehnt. Bitte wähle sie erneut aus der Vorschlagsliste.'
+                : 'Der Eintrag konnte nicht gespeichert werden. Bitte versuche es später erneut.';
           return null;
         });
 
