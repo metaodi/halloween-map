@@ -107,3 +107,17 @@ dialog.modal::backdrop { background: rgba(10, 5, 25, 0.6); }
 .suggestions li[aria-selected='true'], .suggestions li:hover { background: #ece6fa; }
 
 .btn.small { min-height: 40px; margin-top: 8px; padding: 0 12px; font-size: 0.9rem; }
+
+/* Admin */
+.page.admin { max-width: 1000px; margin: 0 auto; min-height: 100%; }
+.page.admin h1 { margin-top: 0; }
+.admin-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px; }
+.field.inline { margin: 0; }
+.field.inline select { min-height: 44px; padding: 0 10px; font: inherit; border: 1px solid #6f6885; border-radius: 8px; background: #fff; }
+.admin-map { height: 320px; margin: 16px 0 8px; border-radius: var(--radius); overflow: hidden; position: relative; }
+.table-wrap { overflow-x: auto; background: #fff; border-radius: var(--radius); }
+.table-wrap table { width: 100%; border-collapse: collapse; min-width: 680px; }
+.table-wrap th, .table-wrap td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+.link-btn { padding: 0; border: 0; background: none; font: inherit; color: var(--accent-strong); text-decoration: underline; cursor: pointer; text-align: left; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.login { max-width: 360px; }

@@ -9,6 +9,8 @@ export interface MapHandle {
   setEntries(entries: Entry[]): void;
   focus(entry: Pick<Entry, 'lat' | 'lng'>): void;
   openPopup(entryId: string): void;
+  /** Zoomt auf alle Einträge, ohne Einträge auf die Mitte des Orts. */
+  fit(entries: Entry[], fallback: Village): void;
 }
 
 export interface MapOptions {
@@ -64,6 +66,13 @@ export function createMap(container: HTMLElement, village: Village, options: Map
     },
     openPopup(entryId) {
       markers.get(entryId)?.openPopup();
+    },
+    fit(entries, fallback) {
+      if (entries.length === 0) {
+        map.setView(fallback.center, fallback.zoom);
+      } else {
+        map.fitBounds(L.latLngBounds(entries.map((e) => [e.lat, e.lng] as [number, number])), { padding: [40, 40], maxZoom: 17 });
+      }
     },
   };
 }
