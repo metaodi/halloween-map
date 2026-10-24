@@ -23,18 +23,38 @@ export function parseSwisstopo(json: SwisstopoResponse, bbox: BBox): GeocodeResu
   return filterByBBox(results, bbox);
 }
 
+/**
+ * WGS84 → LV95 (E, N) nach der Näherungsformel von swisstopo (Genauigkeit ~1 m).
+ * Die SearchServer-API interpretiert `bbox` nur in LV95/LV03, nicht in WGS84.
+ */
+export function wgs84ToLv95(lat: number, lng: number): [number, number] {
+  const phi = (lat * 3600 - 169028.66) / 10000;
+  const lam = (lng * 3600 - 26782.5) / 10000;
+  const e =
+    2600072.37 + 211455.93 * lam - 10938.51 * lam * phi - 0.36 * lam * phi ** 2 - 44.54 * lam ** 3;
+  const n =
+    1200147.07 + 308807.95 * phi + 3745.25 * lam ** 2 + 76.63 * phi ** 2 - 194.56 * lam ** 2 * phi + 119.79 * phi ** 3;
+  return [e, n];
+}
+
+export function bboxToLv95(bbox: BBox): [number, number, number, number] {
+  const [minE, minN] = wgs84ToLv95(bbox[1], bbox[0]);
+  const [maxE, maxN] = wgs84ToLv95(bbox[3], bbox[2]);
+  return [minE, minN, maxE, maxN];
+}
+
 export class SwisstopoGeocoder implements GeocoderProvider {
   async search(query: string, bbox: BBox, signal?: AbortSignal): Promise<GeocodeResult[]> {
     const params = new URLSearchParams({
       searchText: query,
       type: 'locations',
       origins: 'address',
-      sr: '4326',
-      limit: '5',
-      bbox: bbox.join(','),
+      sr: '2056',
+      limit: '20',
+      bbox: bboxToLv95(bbox).map((v) => Math.round(v)).join(','),
     });
     const res = await fetch(`${ENDPOINT}?${params}`, { signal });
     if (!res.ok) throw new Error(`swisstopo: HTTP ${res.status}`);
-    return parseSwisstopo((await res.json()) as SwisstopoResponse, bbox);
+    return parseSwisstopo((await res.json()) as SwisstopoResponse, bbox).slice(0, 8);
   }
 }

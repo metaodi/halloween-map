@@ -61,3 +61,14 @@ describe('isInBBox', () => {
     expect(isInBBox(47.3, 9.0, bbox)).toBe(false);
   });
 });
+
+describe('bboxToLv95', () => {
+  it('rechnet Richterswil korrekt nach LV95 um', async () => {
+    const { bboxToLv95 } = await import('./swisstopo');
+    const [e, n] = bboxToLv95([8.6994, 47.201, 8.6994, 47.201]);
+    expect(e).toBeGreaterThan(2695000);
+    expect(e).toBeLessThan(2696000);
+    expect(n).toBeGreaterThan(1228000);
+    expect(n).toBeLessThan(1230000);
+  });
+});
