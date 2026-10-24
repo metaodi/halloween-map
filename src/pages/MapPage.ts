@@ -1,6 +1,9 @@
 import type { Village } from '../config/villages';
 import { createMap } from '../components/map';
+import { openEntryForm } from '../components/entryForm';
+import { showToast } from '../components/toast';
 import { fetchEntries } from '../lib/supabase/entries';
+import type { Entry } from '../lib/types';
 import { h } from '../lib/dom';
 
 export function renderMapPage(root: HTMLElement, village: Village): void {
@@ -15,13 +18,27 @@ export function renderMapPage(root: HTMLElement, village: Village): void {
   root.append(mapEl, header);
 
   const map = createMap(mapEl, village);
+  let entries: Entry[] = [];
 
-  const status = h('div', { class: 'toast', role: 'status' });
-  root.append(status);
-  fetchEntries(village)
-    .then((entries) => map.setEntries(entries))
-    .catch(() => {
-      status.textContent = 'Die Einträge konnten nicht geladen werden. Bitte Seite neu laden.';
-      status.classList.add('visible');
-    });
+  async function load() {
+    try {
+      entries = await fetchEntries(village);
+      map.setEntries(entries);
+    } catch {
+      showToast('Die Einträge konnten nicht geladen werden. Bitte Seite neu laden.');
+    }
+  }
+
+  const addBtn = h('button', { type: 'button', class: 'btn fab' }, '🎃 Meine Adresse eintragen');
+  addBtn.addEventListener('click', () =>
+    openEntryForm(village, (created) => {
+      entries = [...entries, { ...created, village_slug: village.slug, created_at: new Date().toISOString() }];
+      map.setEntries(entries);
+      map.focus(created);
+      map.openPopup(created.id);
+    }),
+  );
+  root.append(addBtn);
+
+  void load();
 }

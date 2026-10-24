@@ -62,3 +62,46 @@ body { background: var(--bg); }
   background: var(--surface); box-shadow: var(--shadow);
 }
 .toast.visible { display: block; }
+
+.fab {
+  position: fixed; z-index: 600; left: 16px; right: 80px;
+  bottom: calc(env(safe-area-inset-bottom) + 16px);
+  box-shadow: var(--shadow);
+}
+@media (min-width: 600px) { .fab { right: auto; left: 16px; } }
+
+/* Dialog */
+dialog.modal {
+  width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 24px);
+  padding: 0; border: 0; border-radius: var(--radius); background: var(--surface); color: var(--text);
+  box-shadow: var(--shadow);
+}
+dialog.modal::backdrop { background: rgba(10, 5, 25, 0.6); }
+.dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 16px 16px 0; }
+.dialog-head h2 { margin: 0; font-size: 1.2rem; }
+.dialog-close { min-width: 44px; min-height: 44px; border: 0; background: none; font-size: 1.8rem; cursor: pointer; color: var(--text); }
+.dialog-body { padding: 8px 16px 16px; }
+
+/* Formulare */
+.field { display: grid; gap: 4px; margin: 12px 0; }
+.field label { font-weight: 600; }
+.field input[type='text'], .field textarea {
+  width: 100%; min-height: 44px; padding: 10px 12px; font: inherit; color: var(--text);
+  border: 1px solid #6f6885; border-radius: 8px; background: #fff;
+}
+.field.checkbox { grid-template-columns: auto 1fr; align-items: start; gap: 10px; }
+.field.checkbox input { width: 24px; height: 24px; margin: 2px 0 0; }
+.field.checkbox label { font-weight: 400; }
+.field-hint { margin: 0; font-size: 0.85rem; color: var(--muted); }
+.form-error { margin: 8px 0; color: var(--danger); font-weight: 600; min-height: 0; }
+.privacy { font-size: 0.85rem; color: var(--muted); }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+
+.autocomplete { position: relative; }
+.suggestions {
+  position: absolute; z-index: 10; left: 0; right: 0; top: 48px; margin: 0; padding: 4px; list-style: none;
+  max-height: 220px; overflow-y: auto; background: #fff; border: 1px solid #6f6885; border-radius: 8px; box-shadow: var(--shadow);
+}
+.suggestions li { padding: 12px; border-radius: 6px; cursor: pointer; }
+.suggestions li[aria-selected='true'], .suggestions li:hover { background: #ece6fa; }
