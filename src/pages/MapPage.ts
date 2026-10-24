@@ -1,12 +1,13 @@
 import type { Village } from '../config/villages';
 import { createMap } from '../components/map';
+import { openDialog } from '../components/dialog';
 import { openDeleteDialog } from '../components/deleteDialog';
 import { openEntryForm } from '../components/entryForm';
 import { showToast } from '../components/toast';
 import { fetchEntries, getEntryByToken } from '../lib/supabase/entries';
 import { tokenFor } from '../lib/token';
 import type { Entry } from '../lib/types';
-import { h } from '../lib/dom';
+import { formatDate, h } from '../lib/dom';
 
 export function renderMapPage(root: HTMLElement, village: Village, deleteToken?: string | null): void {
   root.replaceChildren();
@@ -59,7 +60,9 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
       map.openPopup(created.id);
     }),
   );
-  root.append(addBtn);
+  const infoBtn = h('button', { type: 'button', class: 'btn secondary info-btn', 'aria-label': 'Info und Datenschutz' }, 'ℹ️ Info');
+  infoBtn.addEventListener('click', () => openDialog('Info und Datenschutz', infoContent(village)));
+  root.append(addBtn, infoBtn);
 
   void load();
   if (deleteToken) void startDeleteFlow(deleteToken);
@@ -81,4 +84,22 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
       showToast('Der Löschlink konnte nicht geprüft werden. Bitte versuche es später erneut.');
     }
   }
+}
+
+function infoContent(village: Village): HTMLElement {
+  return h(
+    'div',
+    {},
+    village.eventDate ? h('p', {}, `Halloween in ${village.name}: ${formatDate(village.eventDate)}.`) : null,
+    h('p', {}, 'Familien tragen ihre Adresse selbst ein, wenn bei ihnen an Halloween Trick-or-Treat erwünscht ist.'),
+    h('h3', {}, 'Datenschutz'),
+    h(
+      'ul',
+      {},
+      h('li', {}, 'Gespeichert werden nur Adresse (Strasse und Nr.) und ein optionaler Hinweis, kein Name.'),
+      h('li', {}, 'Beides ist öffentlich auf der Karte sichtbar.'),
+      h('li', {}, 'Du kannst deinen Eintrag jederzeit mit deinem persönlichen Löschlink entfernen.'),
+      h('li', {}, 'Einträge werden nach Halloween automatisch gelöscht.'),
+    ),
+  );
 }
