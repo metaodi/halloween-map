@@ -55,3 +55,10 @@ body { background: var(--bg); }
 .page { min-height: 100%; padding: 24px 16px; background: #f6f3fb; }
 .page.narrow { max-width: 480px; margin: 0 auto; }
 .village-list { list-style: none; padding: 0; display: grid; gap: 12px; }
+
+.toast {
+  position: fixed; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 16px); z-index: 1000;
+  display: none; padding: 12px 16px; border-radius: var(--radius);
+  background: var(--surface); box-shadow: var(--shadow);
+}
+.toast.visible { display: block; }

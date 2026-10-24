@@ -1,6 +1,6 @@
 import type { Village } from '../config/villages';
 import { createMap } from '../components/map';
-import { demoEntries } from '../lib/demoData';
+import { fetchEntries } from '../lib/supabase/entries';
 import { h } from '../lib/dom';
 
 export function renderMapPage(root: HTMLElement, village: Village): void {
@@ -15,5 +15,13 @@ export function renderMapPage(root: HTMLElement, village: Village): void {
   root.append(mapEl, header);
 
   const map = createMap(mapEl, village);
-  map.setEntries(demoEntries(village.slug, village.center));
+
+  const status = h('div', { class: 'toast', role: 'status' });
+  root.append(status);
+  fetchEntries(village)
+    .then((entries) => map.setEntries(entries))
+    .catch(() => {
+      status.textContent = 'Die Einträge konnten nicht geladen werden. Bitte Seite neu laden.';
+      status.classList.add('visible');
+    });
 }
