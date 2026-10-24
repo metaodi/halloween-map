@@ -89,19 +89,11 @@ Hinweise:
 - GitHub Pages kennt keine Rewrites. Deshalb ist der Admin-Bereich über `?admin` erreichbar (`https://<user>.github.io/<repo>/?admin`) statt über einen Pfad.
 - Supabase: Unter *Authentication → URL Configuration* die Pages-URL als *Site URL* eintragen.
 
-## Automatisches Löschen nach Halloween
+## Aufbewahrung der Daten
 
-Die Oberfläche verspricht, dass Einträge nach Halloween gelöscht werden. Das erledigt ein Cron-Job in Supabase (*Database → Extensions → pg_cron* aktivieren), z. B. am 5. November um 03:00 Uhr:
+Einträge bleiben bis zum Widerruf gespeichert, z. B. für das nächste Halloween. Die Oberfläche sagt das auch so. Es gibt kein automatisches Löschen; wer widerrufen will, nutzt den persönlichen Löschlink (oder meldet sich beim Betreiber, der über die Admin-Seite löscht).
 
-```sql
-select cron.schedule(
-  'halloween-cleanup',
-  '0 3 5 11 *',
-  $$ delete from public.entries $$
-);
-```
-
-Wer Orte mit unterschiedlichen Daten betreibt, löscht gezielt: `delete from public.entries where village_slug = 'meinedorf'`.
+Falls ein früher eingerichteter `pg_cron`-Job `halloween-cleanup` existiert, muss er entfernt werden, sonst löscht er die Einträge trotzdem: `select cron.unschedule('halloween-cleanup');`
 
 ## Projektstruktur
 
