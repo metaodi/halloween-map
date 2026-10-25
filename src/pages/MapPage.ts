@@ -95,14 +95,22 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
   });
 
   const addBtn = h('button', { type: 'button', class: 'btn fab' }, '🎃 Meine Adresse eintragen');
-  addBtn.addEventListener('click', () =>
+  if (!village.active) {
+    addBtn.classList.add('inactive');
+    addBtn.setAttribute('aria-disabled', 'true');
+  }
+  addBtn.addEventListener('click', () => {
+    if (!village.active) {
+      showToast(`Einträge für ${village.name} sind noch nicht freigeschaltet. Bitte kontaktiere Stefan Oderbolz (stefan.oderbolz@metaodi.ch).`);
+      return;
+    }
     openEntryForm(village, (created) => {
       entries = [...entries, { ...created, village_slug: village.slug, created_at: new Date().toISOString() }];
       map.setEntries(entries);
       map.focus(created);
       map.openPopup(created.id);
-    }),
-  );
+    });
+  });
   const infoBtn = h('button', { type: 'button', class: 'btn secondary info-btn', 'aria-label': 'Info und Datenschutz' }, 'ℹ️ Info');
   infoBtn.addEventListener('click', () => openDialog('Info und Datenschutz', infoContent(village)));
   root.append(addBtn, infoBtn, h('div', { class: 'map-actions' }, reloadBtn, locateBtn));
