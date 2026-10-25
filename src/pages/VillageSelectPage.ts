@@ -26,7 +26,7 @@ function villageButton(v: Village): HTMLElement {
   }
   const btn = h('button', { type: 'button', class: 'btn inactive', 'aria-disabled': 'true' }, v.name);
   btn.addEventListener('click', () =>
-    showToast(`${v.name} ist noch nicht freigeschaltet. Bitte kontaktiere Stefan Oderbolz (stefan.oderbolz@metaodi.ch), damit wir die Gemeinde aufschalten können.`),
+    showToast(`${v.name} ist noch nicht freigeschaltet. Bitte kontaktiere mich (siehe Footer), damit ich die Gemeinde aufschalten kann.`),
   );
   return btn;
 }
