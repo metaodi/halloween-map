@@ -29,7 +29,7 @@ export const villages: Village[] = [
     center: [47.3105, 8.5249],
     zoom: 14,
     bbox: [8.495, 47.285, 8.555, 47.335],
-    active: false,
+    active: true,
   },
   {
     // Ortsteil von Wädenswil
