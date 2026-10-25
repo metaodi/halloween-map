@@ -87,7 +87,7 @@ export const villages: Village[] = [
     center: [47.307, 8.5555],
     zoom: 14,
     bbox: [8.535, 47.29, 8.585, 47.325],
-    active: false,
+    active: true,
   },
   {
     slug: 'thalwil',
