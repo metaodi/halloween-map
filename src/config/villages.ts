@@ -114,6 +114,15 @@ export const villages: Village[] = [
     bbox: [8.6, 47.19, 8.73, 47.27],
     active: true,
   },
+  {
+    // Quartier der Stadt Zürich (Kreis 2)
+    slug: 'wollishofen',
+    name: 'Wollishofen (Zürich)',
+    center: [47.3406, 8.5336],
+    zoom: 14,
+    bbox: [8.51, 47.318, 8.56, 47.358],
+    active: true,
+  },
 ];
 
 export function findVillage(slug: string | null | undefined): Village | undefined {
