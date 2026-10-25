@@ -8,7 +8,7 @@ export function renderVillageSelectPage(root: HTMLElement): void {
     h(
       'main',
       { class: 'page narrow' },
-      h('h1', {}, '🎃 HalloweenMap'),
+      h('h1', {}, '🎃 HalloweenKarte'),
       h('p', {}, 'Wo ist an Halloween Trick-or-Treat erwünscht? Wähle deinen Ort:'),
       h(
         'ul',
