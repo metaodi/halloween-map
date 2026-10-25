@@ -10,7 +10,8 @@ const params = new URLSearchParams(window.location.search);
 if (params.has('admin')) {
   void renderAdminPage(root);
 } else {
-  const village = findVillage(params.get('ort')) ?? defaultVillage();
+  // ?gemeinden erzwingt die Gemeindeauswahl, auch wenn eine Standard-Gemeinde konfiguriert ist
+  const village = params.has('gemeinden') ? undefined : (findVillage(params.get('ort')) ?? defaultVillage());
   if (village) {
     document.title = `HalloweenMap ${village.name}`;
     renderMapPage(root, village, params.get('loeschen'));

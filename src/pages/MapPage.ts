@@ -154,5 +154,6 @@ function infoContent(village: Village): HTMLElement {
     ),
     h('h3', {}, 'Kontakt'),
     contactInfo(),
+    h('p', {}, h('a', { href: `${import.meta.env.BASE_URL}?gemeinden` }, '← Alle Gemeinden')),
   );
 }
