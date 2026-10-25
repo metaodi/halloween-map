@@ -4,6 +4,7 @@ import { createMap } from '../components/map';
 import { openDialog } from '../components/dialog';
 import { openDeleteDialog } from '../components/deleteDialog';
 import { openEntryForm } from '../components/entryForm';
+import { setupInstallPrompt } from '../components/installPrompt';
 import { showToast } from '../components/toast';
 import { fetchEntries, getEntryByToken } from '../lib/supabase/entries';
 import { tokenFor } from '../lib/token';
@@ -116,6 +117,7 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
   root.append(addBtn, infoBtn, h('div', { class: 'map-actions' }, reloadBtn, locateBtn));
 
   void load();
+  setupInstallPrompt();
   if (deleteToken) void startDeleteFlow(deleteToken);
 
   /** Löschlink (?loeschen=<token>): Eintrag nachschlagen und Bestätigungsdialog zeigen. */

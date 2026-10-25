@@ -96,6 +96,8 @@ Die Seite ist eine Progressive Web App (`public/manifest.webmanifest`, Icons `pu
 - **iPhone (Safari):** Teilen-Symbol → *Zum Home-Bildschirm*.
 - **Android (Chrome):** Menü ⋮ → *App installieren* bzw. *Zum Startbildschirm hinzufügen*.
 
+Ab dem zweiten Besuch zeigt die Karte nach ein paar Sekunden einen verwerfbaren Hinweis (`src/components/installPrompt.ts`): unter Chrome mit «Installieren»-Button, unter iOS Safari mit Anleitung. In der installierten App erscheint er nie.
+
 Die App startet dann ohne Browserleiste. Einen Service Worker gibt es bewusst nicht, die Karte braucht ohnehin Internet.
 
 ## Aufbewahrung der Daten
