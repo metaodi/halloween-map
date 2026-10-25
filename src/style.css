@@ -55,6 +55,12 @@ body { background: var(--bg); }
 .page { min-height: 100%; padding: 24px 16px; background: #f6f3fb; }
 .page.narrow { max-width: 480px; margin: 0 auto; }
 .village-list { list-style: none; padding: 0; display: grid; gap: 12px; }
+.village-list .btn { width: 100%; }
+.btn.inactive { background: #cfc9dc; color: #5b5470; cursor: pointer; }
+.btn.inactive:hover { background: #c4bdd3; }
+.page-footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+.page-footer p, .contact { margin: 4px 0; }
+.contact a { color: var(--accent-strong); }
 
 .toast {
   position: fixed; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 76px); z-index: 1000;

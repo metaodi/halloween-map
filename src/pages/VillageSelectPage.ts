@@ -1,4 +1,6 @@
-import { villages } from '../config/villages';
+import { villages, type Village } from '../config/villages';
+import { contactInfo } from '../components/contactInfo';
+import { showToast } from '../components/toast';
 import { h } from '../lib/dom';
 
 export function renderVillageSelectPage(root: HTMLElement): void {
@@ -11,10 +13,20 @@ export function renderVillageSelectPage(root: HTMLElement): void {
       h(
         'ul',
         { class: 'village-list' },
-        ...villages.map((v) =>
-          h('li', {}, h('a', { class: 'btn', href: `${import.meta.env.BASE_URL}?ort=${encodeURIComponent(v.slug)}` }, v.name)),
-        ),
+        ...villages.map((v) => h('li', {}, villageButton(v))),
       ),
+      h('footer', { class: 'page-footer' }, h('p', {}, 'Fragen oder Wunsch nach einer neuen Gemeinde? Melde dich bei:'), contactInfo()),
     ),
   );
+}
+
+function villageButton(v: Village): HTMLElement {
+  if (v.active) {
+    return h('a', { class: 'btn', href: `${import.meta.env.BASE_URL}?ort=${encodeURIComponent(v.slug)}` }, v.name);
+  }
+  const btn = h('button', { type: 'button', class: 'btn inactive', 'aria-disabled': 'true' }, v.name);
+  btn.addEventListener('click', () =>
+    showToast(`${v.name} ist noch nicht freigeschaltet. Bitte kontaktiere Stefan Oderbolz (stefan.oderbolz@metaodi.ch), damit wir die Gemeinde aufschalten können.`),
+  );
+  return btn;
 }

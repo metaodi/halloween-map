@@ -1,3 +1,4 @@
+import { contactInfo } from '../components/contactInfo';
 import type { Village } from '../config/villages';
 import { createMap } from '../components/map';
 import { openDialog } from '../components/dialog';
@@ -143,5 +144,7 @@ function infoContent(village: Village): HTMLElement {
       h('li', {}, 'Du kannst deinen Eintrag jederzeit mit deinem persönlichen Löschlink entfernen.'),
       h('li', {}, 'Dein Eintrag bleibt gespeichert, bis du ihn widerrufst (z. B. für das nächste Jahr).'),
     ),
+    h('h3', {}, 'Kontakt'),
+    contactInfo(),
   );
 }
