@@ -32,6 +32,15 @@ export const villages: Village[] = [
     active: false,
   },
   {
+    // Ortsteil von Wädenswil
+    slug: 'au',
+    name: 'Au (Wädenswil)',
+    center: [47.2347, 8.6325],
+    zoom: 15,
+    bbox: [8.605, 47.215, 8.655, 47.25],
+    active: true,
+  },
+  {
     slug: 'hirzel',
     name: 'Hirzel',
     center: [47.2131, 8.6],
