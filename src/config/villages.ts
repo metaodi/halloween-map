@@ -57,6 +57,15 @@ export const villages: Village[] = [
     active: true,
   },
   {
+    // Kanton Zug
+    slug: 'huenenberg',
+    name: 'Hünenberg',
+    center: [47.1757, 8.4258],
+    zoom: 14,
+    bbox: [8.385, 47.145, 8.47, 47.2],
+    active: true,
+  },
+  {
     slug: 'kilchberg',
     name: 'Kilchberg',
     center: [47.3235, 8.5446],
