@@ -63,7 +63,7 @@ export const villages: Village[] = [
     center: [47.1757, 8.4258],
     zoom: 14,
     bbox: [8.385, 47.145, 8.47, 47.2],
-    active: false,
+    active: true,
   },
   {
     slug: 'kilchberg',
