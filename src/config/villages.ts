@@ -19,7 +19,7 @@ export interface Village {
 }
 
 /**
- * Gemeinden des Bezirks Horgen (alphabetisch). Zentrum und bbox sind Näherungswerte und
+ * Gemeinden am Zürichsee und Umgebung (alphabetisch). Zentrum und bbox sind Näherungswerte und
  * sollten beim Freischalten (active: true) geprüft werden.
  */
 export const villages: Village[] = [
@@ -55,6 +55,15 @@ export const villages: Village[] = [
     zoom: 14,
     bbox: [8.56, 47.23, 8.65, 47.29],
     active: true,
+  },
+  {
+    // Kanton Zug
+    slug: 'huenenberg',
+    name: 'Hünenberg',
+    center: [47.1757, 8.4258],
+    zoom: 14,
+    bbox: [8.385, 47.145, 8.47, 47.2],
+    active: false,
   },
   {
     slug: 'kilchberg',
