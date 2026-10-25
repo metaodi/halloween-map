@@ -22,7 +22,7 @@ import type { Entry } from '../lib/types';
 const SWITZERLAND: BBox = [5.9, 45.8, 10.5, 47.9];
 
 export async function renderAdminPage(root: HTMLElement): Promise<void> {
-  document.title = 'HalloweenMap Admin';
+  document.title = 'HalloweenKarte Admin';
   const robots = document.createElement('meta');
   robots.name = 'robots';
   robots.content = 'noindex';
@@ -44,7 +44,7 @@ export async function renderAdminPage(root: HTMLElement): Promise<void> {
 }
 
 function page(...children: Node[]): HTMLElement {
-  return h('main', { class: 'page admin' }, h('h1', {}, '🎃 HalloweenMap Admin'), ...children);
+  return h('main', { class: 'page admin' }, h('h1', {}, '🎃 HalloweenKarte Admin'), ...children);
 }
 
 function renderLogin(root: HTMLElement): void {

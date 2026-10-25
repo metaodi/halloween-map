@@ -1,4 +1,4 @@
-# 🎃 HalloweenMap
+# 🎃 HalloweenKarte
 
 Trick-or-Treat-Karte für Dörfer und Quartiere: Familien tragen ihre Adresse selbst ein und erscheinen mit einem 🎃-Marker. Gebaut mit Vite, TypeScript (ohne UI-Framework), Leaflet/OpenStreetMap und Supabase. Das Frontend ist rein statisch und wird über GitHub Pages ausgeliefert.
 
