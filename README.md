@@ -81,13 +81,13 @@ Der Workflow `.github/workflows/deploy.yml` baut bei jedem Push auf `main` (und 
 1. **Pages aktivieren:** *Settings → Pages → Build and deployment → Source: «GitHub Actions»*.
 2. **Variablen setzen:** *Settings → Secrets and variables → Actions → Variables* (Reiter *Variables*, nicht *Secrets*; der anon key ist ohnehin öffentlich):
    `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_DEFAULT_VILLAGE`, `VITE_GEOCODER`.
-3. **Deployen:** Auf `main` pushen bzw. mergen. Die Seite erscheint unter `https://<user>.github.io/<repo>/`.
+3. **Deployen:** Auf `main` pushen bzw. mergen. Die Seite erscheint unter `https://halloweenkarte.ch/`.
 
 Hinweise:
 
-- Der Workflow setzt `VITE_BASE=/<repo>/` automatisch. Bei einer eigenen Domain oder einer User-Seite (`<user>.github.io`) im Workflow `VITE_BASE: /` setzen.
-- GitHub Pages kennt keine Rewrites. Deshalb ist der Admin-Bereich über `?admin` erreichbar (`https://<user>.github.io/<repo>/?admin`) statt über einen Pfad.
-- Supabase: Unter *Authentication → URL Configuration* die Pages-URL als *Site URL* eintragen.
+- Eigene Domain: `public/CNAME` enthält `halloweenkarte.ch`, der Workflow baut mit `VITE_BASE: /`. Bei Betrieb unter `https://<user>.github.io/<repo>/` müsste `VITE_BASE: /<repo>/` gesetzt und `public/CNAME` entfernt werden.
+- DNS: Beim Registrar `A`-Records für `halloweenkarte.ch` auf `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` (optional `AAAA`: `2606:50c0:8000::153` bis `2606:50c0:8003::153`) und `CNAME www` auf `<user>.github.io`. Danach in *Settings → Pages → Custom domain* die Domain eintragen und *Enforce HTTPS* aktivieren.- GitHub Pages kennt keine Rewrites. Deshalb ist der Admin-Bereich über `?admin` erreichbar (`https://halloweenkarte.ch/?admin`) statt über einen Pfad.
+- Supabase: Unter *Authentication → URL Configuration* `https://halloweenkarte.ch` als *Site URL* eintragen (und unter *Redirect URLs* ergänzen).
 
 ## Aufbewahrung der Daten
 
