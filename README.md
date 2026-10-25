@@ -89,6 +89,15 @@ Hinweise:
 - DNS: Beim Registrar `A`-Records für `halloweenkarte.ch` auf `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` (optional `AAAA`: `2606:50c0:8000::153` bis `2606:50c0:8003::153`) und `CNAME www` auf `<user>.github.io`. Danach in *Settings → Pages → Custom domain* die Domain eintragen und *Enforce HTTPS* aktivieren.- GitHub Pages kennt keine Rewrites. Deshalb ist der Admin-Bereich über `?admin` erreichbar (`https://halloweenkarte.ch/?admin`) statt über einen Pfad.
 - Supabase: Unter *Authentication → URL Configuration* `https://halloweenkarte.ch` als *Site URL* eintragen (und unter *Redirect URLs* ergänzen).
 
+## Als App installieren (PWA)
+
+Die Seite ist eine Progressive Web App (`public/manifest.webmanifest`, Icons `public/icon*.png` und `public/icon.svg`, 🎃-Kürbis). Es braucht keinen App-Store:
+
+- **iPhone (Safari):** Teilen-Symbol → *Zum Home-Bildschirm*.
+- **Android (Chrome):** Menü ⋮ → *App installieren* bzw. *Zum Startbildschirm hinzufügen*.
+
+Die App startet dann ohne Browserleiste. Einen Service Worker gibt es bewusst nicht, die Karte braucht ohnehin Internet.
+
 ## Aufbewahrung der Daten
 
 Einträge bleiben bis zum Widerruf gespeichert, z. B. für das nächste Halloween. Die Oberfläche sagt das auch so. Es gibt kein automatisches Löschen; wer widerrufen will, nutzt den persönlichen Löschlink (oder meldet sich beim Betreiber, der über die Admin-Seite löscht).
