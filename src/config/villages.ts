@@ -35,7 +35,7 @@ export const villages: Village[] = [
     // Ortsteil von Wädenswil
     slug: 'au',
     name: 'Au (Wädenswil)',
-    center: [47.2505, 8.6425],
+    center: [47.2455, 8.6435],
     zoom: 15,
     bbox: [8.605, 47.215, 8.655, 47.25],
     active: true,
