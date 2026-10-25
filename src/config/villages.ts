@@ -103,7 +103,7 @@ export const villages: Village[] = [
     center: [47.2299, 8.672],
     zoom: 14,
     bbox: [8.6, 47.19, 8.73, 47.27],
-    active: false,
+    active: true,
   },
 ];
 
