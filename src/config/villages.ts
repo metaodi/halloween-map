@@ -36,7 +36,7 @@ export const villages: Village[] = [
     slug: 'au',
     name: 'Au (Wädenswil)',
     center: [47.2455, 8.6435],
-    zoom: 15,
+    zoom: 14,
     bbox: [8.605, 47.215, 8.655, 47.25],
     active: true,
   },
