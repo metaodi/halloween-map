@@ -124,6 +124,15 @@ export const villages: Village[] = [
     active: true,
   },
   {
+    // Kanton Schwyz
+    slug: 'wollerau',
+    name: 'Wollerau',
+    center: [47.1953, 8.7253],
+    zoom: 14,
+    bbox: [8.7, 47.175, 8.765, 47.22],
+    active: true,
+  },
+  {
     // Quartier der Stadt Zürich (Kreis 2)
     slug: 'wollishofen',
     name: 'Wollishofen (Zürich)',
