@@ -11,6 +11,8 @@ export interface MapHandle {
   openPopup(entryId: string): void;
   /** Zoomt auf alle Einträge, ohne Einträge auf die Mitte des Orts. */
   fit(entries: Entry[], fallback: Village): void;
+  /** Dunkelt das Gebiet ausserhalb der bbox des Orts ab; null entfernt die Anzeige. */
+  setBounds(village: Pick<Village, 'bbox'> | null): void;
   /** Zeigt die eigene Position (Punkt + Genauigkeitskreis) an. */
   setUserLocation(lat: number, lng: number, accuracy: number): void;
   /** Zentriert die Karte auf die zuletzt bekannte eigene Position; false, wenn keine bekannt ist. */
@@ -53,12 +55,33 @@ export function createMap(container: HTMLElement, village: Village, options: Map
     return root;
   }
 
+  // Gebiet ausserhalb der bbox abdunkeln: Weltrechteck mit Loch in Form der bbox
+  let boundsLayer: L.Polygon | null = null;
+  function setBounds(v: Pick<Village, 'bbox'> | null) {
+    boundsLayer?.remove();
+    boundsLayer = null;
+    if (!v) return;
+    const [minLng, minLat, maxLng, maxLat] = v.bbox;
+    const world: L.LatLngTuple[] = [[-90, -180], [-90, 180], [90, 180], [90, -180]];
+    const hole: L.LatLngTuple[] = [[minLat, minLng], [minLat, maxLng], [maxLat, maxLng], [maxLat, minLng]];
+    boundsLayer = L.polygon([world, hole], {
+      interactive: false,
+      stroke: true,
+      color: '#f97316',
+      weight: 2,
+      fillColor: '#000',
+      fillOpacity: 0.35,
+    }).addTo(map);
+  }
+  setBounds(village);
+
   let userDot: L.CircleMarker | null = null;
   let userAccuracy: L.Circle | null = null;
   let userLatLng: L.LatLng | null = null;
 
   return {
     map,
+    setBounds,
     setUserLocation(lat, lng, accuracy) {
       userLatLng = L.latLng(lat, lng);
       if (!userDot || !userAccuracy) {

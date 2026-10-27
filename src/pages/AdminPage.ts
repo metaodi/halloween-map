@@ -137,6 +137,7 @@ async function renderDashboard(root: HTMLElement): Promise<void> {
 
   const startVillage = villages[0];
   const map: MapHandle = createMap(mapEl, startVillage);
+  map.setBounds(null); // erst bei Auswahl eines Orts anzeigen
 
   function slugs(): string[] {
     return [...new Set([...villages.map((v) => v.slug), ...all.map((e) => e.village_slug)])];
@@ -157,6 +158,7 @@ async function renderDashboard(root: HTMLElement): Promise<void> {
   function refresh(refit: boolean) {
     const entries = visible();
     map.setEntries(entries);
+    if (refit) map.setBounds(findVillage(filter) ?? null);
     if (refit) map.fit(entries, findVillage(filter) ?? startVillage);
     count.textContent = `${entries.length} ${entries.length === 1 ? 'Eintrag' : 'Einträge'}`;
     tbody.replaceChildren(...entries.map(row));
