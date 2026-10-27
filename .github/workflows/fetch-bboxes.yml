@@ -1,0 +1,28 @@
+name: Bounding-Boxen prüfen
+
+# Holt die bbox jedes Orts bei swisstopo und vergleicht sie mit src/config/villages.ts.
+# Ändert nichts; Ergebnis steht in der Job-Zusammenfassung und im Artefakt "bboxes".
+on:
+  push:
+    paths:
+      - src/config/villages.ts
+      - scripts/fetch-bboxes.ts
+      - .github/workflows/fetch-bboxes.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - run: node --experimental-strip-types scripts/fetch-bboxes.ts
+      - uses: actions/upload-artifact@v5
+        with:
+          name: bboxes
+          path: bboxes.json
