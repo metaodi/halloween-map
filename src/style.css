@@ -30,6 +30,15 @@ body { background: var(--bg); }
 .topbar h1 { margin: 0; font-size: 1.2rem; }
 .topbar p { margin: 2px 0 0; font-size: 0.85rem; color: #e5defa; }
 
+/* Hinweis einer Gemeinde (Karte, Formular, Info) */
+.village-notice {
+  margin: 0 0 12px; padding: 8px 12px; border-radius: 8px;
+  background: #fff4e6; color: var(--text); border-left: 4px solid var(--accent);
+  font-size: 0.9rem; line-height: 1.35;
+}
+.village-notice a { color: var(--accent-strong); font-weight: 600; }
+.topbar .village-notice { margin: 6px 0 0; color: var(--text); pointer-events: auto; }
+
 .pumpkin-marker { background: none; border: none; }
 .pumpkin-marker span {
   display: flex; align-items: center; justify-content: center;

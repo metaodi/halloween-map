@@ -14,6 +14,8 @@ export interface Village {
   /** ISO-Datum (YYYY-MM-DD) */
   eventDate?: string;
   welcomeText?: string;
+  /** Gut sichtbarer Hinweis auf der Karte, im Eintragsformular und im Info-Dialog (z. B. auf eine bestehende Gruppe) */
+  notice?: { text: string; link?: { href: string; label: string } };
   /** false = Gemeinde ist noch nicht freigeschaltet: Button ist auf der Übersicht ausgegraut, Tipp zeigt den Kontakthinweis */
   active: boolean;
 }
@@ -114,7 +116,11 @@ export const villages: Village[] = [
     center: [47.2928, 8.5659],
     zoom: 14,
     bbox: [8.545, 47.274, 8.593, 47.309],
-    active: false,
+    active: true,
+    notice: {
+      text: 'Für Thalwil gibt es auch die Facebook-Gruppe «Thalwil Halloween 2026» mit einer eigenen Karte. Schau auch dort vorbei!',
+      link: { href: 'https://www.facebook.com/groups/299732252995490/', label: 'Zur Facebook-Gruppe' },
+    },
   },
   {
     slug: 'waedenswil',

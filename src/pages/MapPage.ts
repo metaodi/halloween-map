@@ -5,6 +5,7 @@ import { openDialog } from '../components/dialog';
 import { openDeleteDialog } from '../components/deleteDialog';
 import { openEntryForm } from '../components/entryForm';
 import { showToast } from '../components/toast';
+import { villageNotice } from '../components/villageNotice';
 import { fetchEntries, getEntryByToken } from '../lib/supabase/entries';
 import { tokenFor } from '../lib/token';
 import type { Entry } from '../lib/types';
@@ -18,6 +19,7 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
     { class: 'topbar' },
     h('h1', {}, `🎃 ${village.name}`),
     village.welcomeText ? h('p', {}, village.welcomeText) : null,
+    villageNotice(village),
   );
   root.append(mapEl, header);
 
@@ -141,6 +143,7 @@ function infoContent(village: Village): HTMLElement {
   return h(
     'div',
     {},
+    villageNotice(village),
     village.eventDate ? h('p', {}, `Halloween in ${village.name}: ${formatDate(village.eventDate)}.`) : null,
     h('p', {}, 'Familien tragen ihre Adresse selbst ein, wenn bei ihnen an Halloween Trick-or-Treat erwünscht ist.'),
     h('h3', {}, 'Datenschutz'),
