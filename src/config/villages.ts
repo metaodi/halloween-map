@@ -19,8 +19,9 @@ export interface Village {
 }
 
 /**
- * Gemeinden am Zürichsee und Umgebung (alphabetisch). Zentrum und bbox sind Näherungswerte und
- * sollten beim Freischalten (active: true) geprüft werden.
+ * Gemeinden am Zürichsee und Umgebung (alphabetisch). Das Zentrum ist ein Näherungswert und sollte
+ * beim Freischalten (active: true) geprüft werden. Die bbox ist das PLZ-Gebiet mit etwas Puffer,
+ * berechnet mit scripts/fetch-bboxes.ts (PLZ des Orts dort eintragen).
  */
 export const villages: Village[] = [
   {
@@ -28,16 +29,16 @@ export const villages: Village[] = [
     name: 'Adliswil',
     center: [47.3105, 8.5249],
     zoom: 14,
-    bbox: [8.495, 47.285, 8.555, 47.335],
+    bbox: [8.5, 47.284, 8.544, 47.333],
     active: true,
   },
   {
     // Ortsteil von Wädenswil
     slug: 'au',
     name: 'Au (Wädenswil)',
-    center: [47.2455, 8.6435],
+    center: [47.249, 8.65],
     zoom: 14,
-    bbox: [8.605, 47.215, 8.655, 47.25],
+    bbox: [8.625, 47.233, 8.682, 47.264],
     active: true,
   },
   {
@@ -45,7 +46,7 @@ export const villages: Village[] = [
     name: 'Hirzel',
     center: [47.2131, 8.6],
     zoom: 14,
-    bbox: [8.565, 47.185, 8.64, 47.24],
+    bbox: [8.572, 47.197, 8.632, 47.242],
     active: false,
   },
   {
@@ -53,7 +54,7 @@ export const villages: Village[] = [
     name: 'Horgen',
     center: [47.2594, 8.5988],
     zoom: 14,
-    bbox: [8.56, 47.23, 8.65, 47.29],
+    bbox: [8.572, 47.22, 8.636, 47.279],
     active: true,
   },
   {
@@ -62,7 +63,7 @@ export const villages: Village[] = [
     name: 'Hünenberg',
     center: [47.1757, 8.4258],
     zoom: 14,
-    bbox: [8.385, 47.145, 8.47, 47.2],
+    bbox: [8.391, 47.151, 8.464, 47.251],
     active: true,
   },
   {
@@ -70,7 +71,7 @@ export const villages: Village[] = [
     name: 'Kilchberg',
     center: [47.3235, 8.5446],
     zoom: 14,
-    bbox: [8.525, 47.305, 8.565, 47.34],
+    bbox: [8.531, 47.307, 8.569, 47.344],
     active: false,
   },
   {
@@ -78,7 +79,7 @@ export const villages: Village[] = [
     name: 'Langnau am Albis',
     center: [47.2899, 8.5372],
     zoom: 14,
-    bbox: [8.505, 47.25, 8.57, 47.32],
+    bbox: [8.501, 47.234, 8.581, 47.303],
     active: false,
   },
   {
@@ -86,7 +87,7 @@ export const villages: Village[] = [
     name: 'Oberrieden',
     center: [47.2706, 8.5758],
     zoom: 14,
-    bbox: [8.555, 47.255, 8.6, 47.29],
+    bbox: [8.551, 47.26, 8.603, 47.289],
     active: false,
   },
   {
@@ -94,7 +95,7 @@ export const villages: Village[] = [
     name: 'Richterswil',
     center: [47.201, 8.6994],
     zoom: 14,
-    bbox: [8.678, 47.181, 8.71, 47.224],
+    bbox: [8.676, 47.194, 8.743, 47.234],
     active: true,
     eventDate: '2026-10-31',
     welcomeText: 'Hier siehst du, wo an Halloween Trick-or-Treat erwünscht ist.',
@@ -104,7 +105,7 @@ export const villages: Village[] = [
     name: 'Rüschlikon',
     center: [47.307, 8.5555],
     zoom: 14,
-    bbox: [8.535, 47.29, 8.585, 47.325],
+    bbox: [8.528, 47.291, 8.577, 47.321],
     active: true,
   },
   {
@@ -112,7 +113,7 @@ export const villages: Village[] = [
     name: 'Thalwil',
     center: [47.2928, 8.5659],
     zoom: 14,
-    bbox: [8.54, 47.27, 8.6, 47.315],
+    bbox: [8.545, 47.274, 8.593, 47.309],
     active: false,
   },
   {
@@ -120,7 +121,7 @@ export const villages: Village[] = [
     name: 'Wädenswil',
     center: [47.2299, 8.672],
     zoom: 14,
-    bbox: [8.6, 47.19, 8.73, 47.27],
+    bbox: [8.614, 47.197, 8.705, 47.248],
     active: true,
   },
   {
@@ -129,7 +130,7 @@ export const villages: Village[] = [
     name: 'Wollerau',
     center: [47.1953, 8.7253],
     zoom: 14,
-    bbox: [8.7, 47.175, 8.765, 47.22],
+    bbox: [8.678, 47.174, 8.758, 47.205],
     active: true,
   },
   {
@@ -138,7 +139,7 @@ export const villages: Village[] = [
     name: 'Wollishofen (Zürich)',
     center: [47.3406, 8.5336],
     zoom: 14,
-    bbox: [8.51, 47.318, 8.56, 47.358],
+    bbox: [8.517, 47.325, 8.557, 47.356],
     active: true,
   },
 ];
