@@ -29,6 +29,18 @@ const SEARCH_URL = 'https://api3.geo.admin.ch/rest/services/api/SearchServer';
 /** Orte, die keine Gemeinde sind oder deren Name nicht eindeutig ist: Suche über PLZ */
 const overrides: Record<string, Query[]> = {
   au: [{ origin: 'zipcode', text: '8804' }],
+  // 2018 in Horgen eingemeindet
+  hirzel: [{ origin: 'zipcode', text: '8816' }],
+  // Gemeinde enthält Hirzel, daher auch nur das PLZ-Gebiet
+  horgen: [
+    { origin: 'gg25', text: 'Horgen' },
+    { origin: 'zipcode', text: '8810' },
+  ],
+  // Gemeinde enthält Au, Schönenberg und Hütten, daher auch nur das PLZ-Gebiet
+  waedenswil: [
+    { origin: 'gg25', text: 'Wädenswil' },
+    { origin: 'zipcode', text: '8820' },
+  ],
   wollishofen: [{ origin: 'zipcode', text: '8038' }],
 };
 
@@ -49,7 +61,7 @@ function labelMatches(origin: Origin, label: string, text: string): boolean {
   const t = normalize(text);
   if (origin === 'gg25') return l === t || l.startsWith(`${t} (`);
   if (/^\d{4}$/.test(text)) return l.startsWith(`${t} `);
-  const place = l.replace(/^\d{4}\s*-\s*/, '');
+  const place = l.replace(/^\d{4}\s*-?\s*/, '');
   return place === t || place.startsWith(`${t} `);
 }
 
@@ -83,7 +95,7 @@ function roundOut([minLng, minLat, maxLng, maxLat]: BBox): BBox {
   return [down(minLng), down(minLat), up(maxLng), up(maxLat)];
 }
 
-async function search(q: Query): Promise<{ label: string; bbox: BBox }[]> {
+async function search(q: Query): Promise<{ found: { label: string; bbox: BBox }[]; others: string[] }> {
   const url = new URL(SEARCH_URL);
   url.search = new URLSearchParams({
     type: 'locations',
@@ -95,13 +107,15 @@ async function search(q: Query): Promise<{ label: string; bbox: BBox }[]> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`${q.origin} "${q.text}": HTTP ${res.status}`);
   const data = (await res.json()) as { results?: { attrs?: { label?: string; geom_st_box2d?: string } }[] };
-  const out: { label: string; bbox: BBox }[] = [];
+  const found: { label: string; bbox: BBox }[] = [];
+  const others: string[] = [];
   for (const r of data.results ?? []) {
     const label = stripTags(r.attrs?.label ?? '');
     const bbox = r.attrs?.geom_st_box2d ? parseBox(r.attrs.geom_st_box2d) : undefined;
-    if (bbox && labelMatches(q.origin, label, q.text)) out.push({ label, bbox: roundOut(bbox) });
+    if (bbox && labelMatches(q.origin, label, q.text)) found.push({ label, bbox: roundOut(bbox) });
+    else others.push(label);
   }
-  return out;
+  return { found, others };
 }
 
 const fmt = (b: BBox) => `[${b.join(', ')}]`;
@@ -119,13 +133,14 @@ async function main() {
   for (const v of villages) {
     for (const q of queriesFor(v)) {
       let found: { label: string; bbox: BBox }[];
+      let others: string[];
       try {
-        found = await search(q);
+        ({ found, others } = await search(q));
       } catch (e) {
         lines.push(`| ${v.slug} | ${q.origin} "${q.text}" | Fehler: ${(e as Error).message} | | ${fmt(v.bbox)} | |`);
         continue;
       }
-      if (found.length === 0) lines.push(`| ${v.slug} | ${q.origin} "${q.text}" | kein Treffer | | ${fmt(v.bbox)} | |`);
+      if (found.length === 0) lines.push(`| ${v.slug} | ${q.origin} "${q.text}" | kein Treffer (${others.slice(0, 5).join('; ') || '–'}) | | ${fmt(v.bbox)} | |`);
       for (const f of found) {
         matches.push({ slug: v.slug, origin: q.origin, ...f });
         const centerInside = contains(f.bbox, v.center) ? 'ja' : '**nein**';
