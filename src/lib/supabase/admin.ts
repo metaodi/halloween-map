@@ -34,6 +34,7 @@ export async function fetchAllEntries(): Promise<Entry[]> {
 }
 
 export interface EntryUpdate {
+  village_slug: string;
   address_label: string;
   lat: number;
   lng: number;

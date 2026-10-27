@@ -3,7 +3,7 @@ import { confirmDialog } from '../components/confirmDialog';
 import { openDialog } from '../components/dialog';
 import { createMap, type MapHandle } from '../components/map';
 import { showToast } from '../components/toast';
-import { findVillage, villages, type Village } from '../config/villages';
+import { findVillage, villages } from '../config/villages';
 import { formatDate, h } from '../lib/dom';
 import { createGeocoder } from '../lib/geocoding';
 import type { BBox } from '../lib/geocoding';
@@ -206,11 +206,19 @@ async function renderDashboard(root: HTMLElement): Promise<void> {
 }
 
 function openEditDialog(entry: Entry, onSaved: (updated: Entry) => void): void {
-  const village: Village | undefined = findVillage(entry.village_slug);
-  const autocomplete = createAddressAutocomplete(createGeocoder(), village?.bbox ?? SWITZERLAND);
+  // Ganze Schweiz, damit auch Adressen eines anderen Orts gesucht werden können
+  const autocomplete = createAddressAutocomplete(createGeocoder(), SWITZERLAND);
   // Vorbelegt mit der bestehenden Adresse: ohne neue Auswahl bleiben die Koordinaten unverändert
   autocomplete.setSelected({ label: entry.address_label, lat: entry.lat, lng: entry.lng });
   autocomplete.input.setAttribute('autofocus', '');
+
+  const slugOptions = [...new Set([...villages.map((v) => v.slug), entry.village_slug])];
+  const villageSelect = h(
+    'select',
+    { id: 'edit-village' },
+    ...slugOptions.map((s) => h('option', { value: s }, findVillage(s)?.name ?? s)),
+  );
+  villageSelect.value = entry.village_slug;
 
   const note = h('textarea', { id: 'edit-note', maxlength: 140, rows: 2 });
   note.value = entry.note ?? '';
@@ -224,6 +232,13 @@ function openEditDialog(entry: Entry, onSaved: (updated: Entry) => void): void {
       { class: 'field' },
       h('label', { for: autocomplete.input.id }, 'Adresse (zum Neu-Geocodieren neu suchen)'),
       autocomplete.el,
+    ),
+    h(
+      'div',
+      { class: 'field' },
+      h('label', { for: 'edit-village' }, 'Ort'),
+      villageSelect,
+      h('p', { class: 'field-hint' }, 'Beim Umhängen die Adresse oben bei Bedarf neu suchen, damit die Position stimmt.'),
     ),
     h('div', { class: 'field' }, h('label', { for: 'edit-note' }, 'Hinweis'), note),
     error,
@@ -240,7 +255,7 @@ function openEditDialog(entry: Entry, onSaved: (updated: Entry) => void): void {
       return;
     }
     submit.disabled = true;
-    const update = { address_label: selected.label, lat: selected.lat, lng: selected.lng, note: note.value.trim() || null };
+    const update = { village_slug: villageSelect.value, address_label: selected.label, lat: selected.lat, lng: selected.lng, note: note.value.trim() || null };
     try {
       await updateEntry(entry.id, update);
       dialog.close();
