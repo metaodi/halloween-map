@@ -1,7 +1,7 @@
 /**
- * Holt für alle Orte aus src/config/villages.ts die Bounding-Box bei swisstopo
- * (SearchServer: Gemeinden "gg25" und Postleitzahl-Gebiete "zipcode") und vergleicht sie mit der
- * konfigurierten bbox. Ändert nichts, gibt nur einen Bericht aus.
+ * Berechnet für alle Orte aus src/config/villages.ts eine bbox aus den PLZ-Gebieten von swisstopo
+ * (amtliches Ortschaftenverzeichnis, SearchServer "zipcode"), mit etwas Puffer, und vergleicht sie
+ * mit der konfigurierten bbox. Ändert nichts, gibt nur einen Bericht aus.
  *
  * Aufruf (Node 22): node --experimental-strip-types scripts/fetch-bboxes.ts
  * In GitHub Actions wird der Bericht zusätzlich in die Job-Zusammenfassung geschrieben.
@@ -10,55 +10,52 @@ import { appendFileSync, writeFileSync } from 'node:fs';
 import { villages, type Village } from '../src/config/villages.ts';
 
 type BBox = Village['bbox'];
-type Origin = 'gg25' | 'zipcode';
 
-interface Query {
-  origin: Origin;
-  text: string;
+interface Area {
+  plz: string;
+  /** Nur nötig, wenn mehrere Ortschaften dieselbe PLZ haben */
+  place?: string;
 }
 
 interface Match {
-  slug: string;
-  origin: Origin;
   label: string;
   bbox: BBox;
 }
 
 const SEARCH_URL = 'https://api3.geo.admin.ch/rest/services/api/SearchServer';
 
-/** Orte, die keine Gemeinde sind oder deren Name nicht eindeutig ist: Suche über PLZ */
-const overrides: Record<string, Query[]> = {
-  au: [{ origin: 'zipcode', text: '8804' }],
-  // 2018 in Horgen eingemeindet
-  hirzel: [{ origin: 'zipcode', text: '8816' }],
-  // Gemeinde enthält Hirzel, daher auch nur das PLZ-Gebiet
-  horgen: [
-    { origin: 'gg25', text: 'Horgen' },
-    { origin: 'zipcode', text: '8810' },
-  ],
-  // Gemeinde enthält Au, Schönenberg und Hütten, daher auch nur das PLZ-Gebiet
-  waedenswil: [
-    { origin: 'gg25', text: 'Wädenswil' },
-    { origin: 'zipcode', text: '8820' },
-  ],
-  wollishofen: [{ origin: 'zipcode', text: '8038' }],
-};
+/** Puffer in Grad rund um die PLZ-Gebiete (~150 m in Länge, ~220 m in Breite) */
+const BUFFER = 0.002;
 
-function queriesFor(v: Village): Query[] {
-  const name = v.name.replace(/\s*\(.*\)$/, '');
-  // zipcode findet nur PLZ-Nummern, nicht Ortsnamen
-  return overrides[v.slug] ?? [{ origin: 'gg25', text: name }];
-}
+/** PLZ-Gebiete pro Ort; ein neuer Ort braucht hier einen Eintrag */
+const areas: Record<string, Area[]> = {
+  adliswil: [{ plz: '8134' }],
+  au: [{ plz: '8804' }],
+  hirzel: [{ plz: '8816' }],
+  horgen: [{ plz: '8810' }],
+  huenenberg: [{ plz: '6331' }, { plz: '6333' }],
+  kilchberg: [{ plz: '8802' }],
+  'langnau-am-albis': [{ plz: '8135' }],
+  oberrieden: [{ plz: '8942' }],
+  richterswil: [{ plz: '8805' }],
+  rueschlikon: [{ plz: '8803' }],
+  thalwil: [{ plz: '8800' }],
+  waedenswil: [{ plz: '8820' }],
+  wollerau: [{ plz: '8832', place: 'Wollerau' }],
+  wollishofen: [{ plz: '8038' }],
+};
 
 const stripTags = (s: string) => s.replace(/<[^>]*>/g, '').trim();
 const normalize = (s: string) => s.toLocaleLowerCase('de-CH');
 
-/** Gemeinde: "Horgen (ZH)"; PLZ (Suche nur über die Nummer): "8810 - Horgen" bzw. "8804 - Au ZH" */
-function labelMatches(origin: Origin, label: string, text: string): boolean {
+/** Label z. B. "8810 - Horgen" bzw. "8804 - Au ZH" */
+function labelMatches(label: string, area: Area): boolean {
   const l = normalize(label);
-  const t = normalize(text);
-  if (origin === 'gg25') return l === t || l.startsWith(`${t} (`);
-  return l.startsWith(`${t} `);
+  if (!l.startsWith(`${area.plz} `)) return false;
+  if (!area.place) return true;
+  const place = l.replace(/^\d{4}\s*-?\s*/, '');
+  const p = normalize(area.place);
+  return place === p || place.startsWith(`${p} `);
 }
 
 /** Näherungsformel von swisstopo, LV95 bzw. LV03 → WGS84, Genauigkeit ~1 m */
@@ -84,72 +81,94 @@ function parseBox(box: string): BBox | undefined {
   return [Math.min(...lngs), Math.min(...lats), Math.max(...lngs), Math.max(...lats)];
 }
 
-/** Auf 3 Nachkommastellen (~100 m) nach aussen runden */
-function roundOut([minLng, minLat, maxLng, maxLat]: BBox): BBox {
-  const down = (n: number) => Math.floor(n * 1000) / 1000;
-  const up = (n: number) => Math.ceil(n * 1000) / 1000;
+function union(boxes: BBox[]): BBox {
+  return [
+    Math.min(...boxes.map((b) => b[0])),
+    Math.min(...boxes.map((b) => b[1])),
+    Math.max(...boxes.map((b) => b[2])),
+    Math.max(...boxes.map((b) => b[3])),
+  ];
+}
+
+/** Puffer anlegen und auf 3 Nachkommastellen (~100 m) nach aussen runden */
+function bufferAndRound([minLng, minLat, maxLng, maxLat]: BBox): BBox {
+  const down = (n: number) => Math.floor((n - BUFFER) * 1000) / 1000;
+  const up = (n: number) => Math.ceil((n + BUFFER) * 1000) / 1000;
   return [down(minLng), down(minLat), up(maxLng), up(maxLat)];
 }
 
-async function search(q: Query): Promise<{ found: { label: string; bbox: BBox }[]; others: string[] }> {
+async function search(area: Area): Promise<{ found: Match[]; others: string[] }> {
   const url = new URL(SEARCH_URL);
   url.search = new URLSearchParams({
     type: 'locations',
-    origins: q.origin,
-    searchText: q.text,
+    origins: 'zipcode',
+    searchText: area.plz,
     sr: '4326',
     limit: '20',
   }).toString();
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`${q.origin} "${q.text}": HTTP ${res.status}`);
+  if (!res.ok) throw new Error(`PLZ ${area.plz}: HTTP ${res.status}`);
   const data = (await res.json()) as { results?: { attrs?: { label?: string; geom_st_box2d?: string } }[] };
-  const found: { label: string; bbox: BBox }[] = [];
+  const found: Match[] = [];
   const others: string[] = [];
   for (const r of data.results ?? []) {
     const label = stripTags(r.attrs?.label ?? '');
     const bbox = r.attrs?.geom_st_box2d ? parseBox(r.attrs.geom_st_box2d) : undefined;
-    if (bbox && labelMatches(q.origin, label, q.text)) found.push({ label, bbox: roundOut(bbox) });
+    if (bbox && labelMatches(label, area)) found.push({ label, bbox });
     else others.push(label);
   }
   return { found, others };
 }
 
 const fmt = (b: BBox) => `[${b.join(', ')}]`;
+const round = (b: BBox) => b.map((n) => Math.round(n * 1e4) / 1e4) as BBox;
 
 function contains([minLng, minLat, maxLng, maxLat]: BBox, [lat, lng]: [number, number]): boolean {
   return lat >= minLat && lat <= maxLat && lng >= minLng && lng <= maxLng;
 }
 
 async function main() {
-  const matches: Match[] = [];
+  const proposals: Record<string, BBox> = {};
   const lines: string[] = [
-    '| Ort | Quelle | Treffer | bbox swisstopo | bbox aktuell | Zentrum drin? |',
-    '|---|---|---|---|---|---|',
+    '| Ort | PLZ-Gebiete (exakt) | bbox vorgeschlagen | bbox aktuell | Zentrum drin? |',
+    '|---|---|---|---|---|',
   ];
   for (const v of villages) {
-    for (const q of queriesFor(v)) {
-      let found: { label: string; bbox: BBox }[];
-      let others: string[];
+    const wanted = areas[v.slug];
+    if (!wanted) {
+      lines.push(`| ${v.slug} | keine PLZ in scripts/fetch-bboxes.ts | | ${fmt(v.bbox)} | |`);
+      continue;
+    }
+    const matches: Match[] = [];
+    const problems: string[] = [];
+    for (const area of wanted) {
       try {
-        ({ found, others } = await search(q));
+        const { found, others } = await search(area);
+        if (found.length === 0) problems.push(`${area.plz}: kein Treffer (${others.slice(0, 5).join('; ') || '–'})`);
+        matches.push(...found);
       } catch (e) {
-        lines.push(`| ${v.slug} | ${q.origin} "${q.text}" | Fehler: ${(e as Error).message} | | ${fmt(v.bbox)} | |`);
-        continue;
-      }
-      if (found.length === 0) lines.push(`| ${v.slug} | ${q.origin} "${q.text}" | kein Treffer (${others.slice(0, 5).join('; ') || '–'}) | | ${fmt(v.bbox)} | |`);
-      for (const f of found) {
-        matches.push({ slug: v.slug, origin: q.origin, ...f });
-        const centerInside = contains(f.bbox, v.center) ? 'ja' : '**nein**';
-        lines.push(`| ${v.slug} | ${q.origin} | ${f.label} | ${fmt(f.bbox)} | ${fmt(v.bbox)} | ${centerInside} |`);
+        problems.push((e as Error).message);
       }
     }
+    const exact = matches.map((m) => `${m.label} ${fmt(round(m.bbox))}`);
+    const cells = [...exact, ...problems.map((p) => `**${p}**`)].join('<br>');
+    if (matches.length === 0) {
+      lines.push(`| ${v.slug} | ${cells} | | ${fmt(v.bbox)} | |`);
+      continue;
+    }
+    const proposed = bufferAndRound(union(matches.map((m) => m.bbox)));
+    proposals[v.slug] = proposed;
+    const centerInside = contains(proposed, v.center) ? 'ja' : '**nein**';
+    lines.push(`| ${v.slug} | ${cells} | ${fmt(proposed)} | ${fmt(v.bbox)} | ${centerInside} |`);
   }
 
-  const report = `## Bounding-Boxen von swisstopo\n\nFormat: [minLng, minLat, maxLng, maxLat]\n\n${lines.join('\n')}\n`;
+  const report =
+    `## Bounding-Boxen aus PLZ-Gebieten (swisstopo)\n\n` +
+    `Format: [minLng, minLat, maxLng, maxLat], Puffer ${BUFFER}°\n\n${lines.join('\n')}\n`;
   console.log(report);
   console.log('JSON:');
-  console.log(JSON.stringify(matches, null, 2));
-  writeFileSync('bboxes.json', `${JSON.stringify(matches, null, 2)}\n`);
+  console.log(JSON.stringify(proposals, null, 2));
+  writeFileSync('bboxes.json', `${JSON.stringify(proposals, null, 2)}\n`);
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, report);
 }
 

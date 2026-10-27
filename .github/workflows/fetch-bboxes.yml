@@ -1,6 +1,6 @@
 name: Bounding-Boxen prüfen
 
-# Holt die bbox jedes Orts bei swisstopo und vergleicht sie mit src/config/villages.ts.
+# Berechnet die bbox jedes Orts aus den PLZ-Gebieten von swisstopo und vergleicht sie mit src/config/villages.ts.
 # Ändert nichts; Ergebnis steht in der Job-Zusammenfassung und im Artefakt "bboxes".
 on:
   push:
