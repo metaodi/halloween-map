@@ -46,23 +46,19 @@ const overrides: Record<string, Query[]> = {
 
 function queriesFor(v: Village): Query[] {
   const name = v.name.replace(/\s*\(.*\)$/, '');
-  return overrides[v.slug] ?? [
-    { origin: 'gg25', text: name },
-    { origin: 'zipcode', text: name },
-  ];
+  // zipcode findet nur PLZ-Nummern, nicht Ortsnamen
+  return overrides[v.slug] ?? [{ origin: 'gg25', text: name }];
 }
 
 const stripTags = (s: string) => s.replace(/<[^>]*>/g, '').trim();
 const normalize = (s: string) => s.toLocaleLowerCase('de-CH');
 
-/** Gemeinde: "Horgen (ZH)" o. ä.; PLZ: "8810 - Horgen" bzw. "8804 - Au ZH" */
+/** Gemeinde: "Horgen (ZH)"; PLZ (Suche nur über die Nummer): "8810 - Horgen" bzw. "8804 - Au ZH" */
 function labelMatches(origin: Origin, label: string, text: string): boolean {
   const l = normalize(label);
   const t = normalize(text);
   if (origin === 'gg25') return l === t || l.startsWith(`${t} (`);
-  if (/^\d{4}$/.test(text)) return l.startsWith(`${t} `);
-  const place = l.replace(/^\d{4}\s*-?\s*/, '');
-  return place === t || place.startsWith(`${t} `);
+  return l.startsWith(`${t} `);
 }
 
 /** Näherungsformel von swisstopo, LV95 bzw. LV03 → WGS84, Genauigkeit ~1 m */
