@@ -5,6 +5,7 @@ import { createEntry, SupabaseRpcError } from '../lib/supabase/entries';
 import { generateToken, rememberToken } from '../lib/token';
 import { createAddressAutocomplete } from './addressAutocomplete';
 import { openDialog } from './dialog';
+import { villageNotice } from './villageNotice';
 
 const NOTE_MAX = 140;
 const RATE_LIMIT_CODE = '54000';
@@ -47,6 +48,7 @@ export function openEntryForm(village: Village, onCreated: (entry: CreatedEntry)
   const form = h(
     'form',
     { novalidate: true },
+    villageNotice(village),
     h('div', { class: 'field' }, h('label', { for: autocomplete.input.id }, 'Adresse'), autocomplete.el),
     h('div', { class: 'field' }, h('label', { for: 'entry-note' }, 'Hinweis (optional)'), note, counter),
     h(
