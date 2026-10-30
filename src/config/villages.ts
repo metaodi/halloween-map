@@ -82,7 +82,7 @@ export const villages: Village[] = [
     center: [47.2899, 8.5372],
     zoom: 14,
     bbox: [8.501, 47.234, 8.581, 47.303],
-    active: false,
+    active: true,
   },
   {
     slug: 'oberrieden',
