@@ -4,7 +4,7 @@ import { openDialog } from '../components/dialog';
 import { createMap, type MapHandle } from '../components/map';
 import { showToast } from '../components/toast';
 import { findVillage, villages } from '../config/villages';
-import { formatDate, h } from '../lib/dom';
+import { formatDateTime, h } from '../lib/dom';
 import { createGeocoder } from '../lib/geocoding';
 import type { BBox } from '../lib/geocoding';
 import { supabase } from '../lib/supabase/client';
@@ -199,7 +199,7 @@ async function renderDashboard(root: HTMLElement): Promise<void> {
       h('td', {}, findVillage(entry.village_slug)?.name ?? entry.village_slug),
       h('td', {}, show),
       h('td', {}, entry.note ?? ''),
-      h('td', {}, formatDate(entry.created_at)),
+      h('td', {}, formatDateTime(entry.created_at)),
       h('td', {}, h('div', { class: 'actions' }, edit, del)),
     );
   }
