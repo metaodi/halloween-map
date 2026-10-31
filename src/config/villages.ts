@@ -46,13 +46,40 @@ export const villages: Village[] = [
     active: true,
   },
   {
-    // Kanton Schwyz (inkl. Pfäffikon, Bäch, Wilen, Hurden)
+    // Ortsteil der Gemeinde Freienbach (Kanton Schwyz)
+    slug: 'baech',
+    name: 'Bäch (Freienbach)',
+    center: [47.1935, 8.735],
+    zoom: 14,
+    bbox: [8.715, 47.178, 8.755, 47.205],
+    active: false,
+  },
+  {
+    // Kanton Schwyz
     slug: 'freienbach',
     name: 'Freienbach',
     center: [47.2038, 8.7741],
     zoom: 14,
-    bbox: [8.715, 47.17, 8.845, 47.225],
+    bbox: [8.755, 47.19, 8.795, 47.216],
     active: true,
+  },
+  {
+    // Ortsteil der Gemeinde Freienbach (Kanton Schwyz)
+    slug: 'hurden',
+    name: 'Hurden (Freienbach)',
+    center: [47.202, 8.83],
+    zoom: 14,
+    bbox: [8.805, 47.19, 8.85, 47.215],
+    active: false,
+  },
+  {
+    // Ortsteil der Gemeinde Freienbach (Kanton Schwyz)
+    slug: 'wilen-freienbach',
+    name: 'Wilen (Freienbach)',
+    center: [47.195, 8.76],
+    zoom: 14,
+    bbox: [8.745, 47.18, 8.78, 47.205],
+    active: false,
   },
   {
     slug: 'hirzel',
