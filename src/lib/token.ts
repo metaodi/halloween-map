@@ -15,33 +15,40 @@ export async function sha256Hex(input: string): Promise<string> {
   return Array.from(new Uint8Array(bytes), (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-/** Löschtokens der eigenen Einträge (entryId → token), nur im Browser gespeichert. */
-export function loadTokens(): Record<string, string> {
-  try {
-    const parsed: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}');
-    return parsed && typeof parsed === 'object' ? (parsed as Record<string, string>) : {};
-  } catch {
-    return {};
+/** Speicher für Löschtokens (id → token), nur im Browser. */
+function tokenStore(storageKey: string) {
+  function load(): Record<string, string> {
+    try {
+      const parsed: unknown = JSON.parse(localStorage.getItem(storageKey) ?? '{}');
+      return parsed && typeof parsed === 'object' ? (parsed as Record<string, string>) : {};
+    } catch {
+      return {};
+    }
   }
-}
-
-function saveTokens(tokens: Record<string, string>): void {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
-  } catch {
-    // localStorage nicht verfügbar (z. B. privater Modus): der Löschlink funktioniert trotzdem
+  function save(tokens: Record<string, string>): void {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(tokens));
+    } catch {
+      // localStorage nicht verfügbar (z. B. privater Modus): der Löschlink funktioniert trotzdem
+    }
   }
+  return {
+    load,
+    remember: (id: string, token: string) => save({ ...load(), [id]: token }),
+    forget: (id: string) => {
+      const { [id]: _removed, ...rest } = load();
+      save(rest);
+    },
+    tokenFor: (id: string): string | undefined => load()[id],
+  };
 }
 
-export function rememberToken(entryId: string, token: string): void {
-  saveTokens({ ...loadTokens(), [entryId]: token });
-}
+/** Löschtokens der eigenen Einträge (entryId → token). */
+const entryTokens = tokenStore(STORAGE_KEY);
+export const loadTokens = entryTokens.load;
+export const rememberToken = entryTokens.remember;
+export const forgetToken = entryTokens.forget;
+export const tokenFor = entryTokens.tokenFor;
 
-export function forgetToken(entryId: string): void {
-  const { [entryId]: _removed, ...rest } = loadTokens();
-  saveTokens(rest);
-}
-
-export function tokenFor(entryId: string): string | undefined {
-  return loadTokens()[entryId];
-}
+/** Löschtokens der eigenen Nachrichten (messageId → token). */
+export const messageTokens = tokenStore('halloweenmap:message-tokens');

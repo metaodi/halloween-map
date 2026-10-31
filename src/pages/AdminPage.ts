@@ -17,7 +17,8 @@ import {
   signOut,
   updateEntry,
 } from '../lib/supabase/admin';
-import type { Entry } from '../lib/types';
+import { deleteMessage, fetchAllMessages, setMessageSticky } from '../lib/supabase/messages';
+import type { Entry, Message } from '../lib/types';
 
 const SWITZERLAND: BBox = [5.9, 45.8, 10.5, 47.9];
 
@@ -87,12 +88,18 @@ function renderForbidden(root: HTMLElement): void {
 
 async function renderDashboard(root: HTMLElement): Promise<void> {
   let all: Entry[];
+  const messagesResult = fetchAllMessages().then(
+    (m) => m,
+    () => null,
+  );
   try {
     all = await fetchAllEntries();
   } catch {
     root.replaceChildren(page(h('p', { role: 'alert' }, 'Die Einträge konnten nicht geladen werden.')));
     return;
   }
+  // null = Laden fehlgeschlagen (z. B. Migration für Nachrichten noch nicht eingespielt)
+  let allMessages: Message[] | null = await messagesResult;
 
   let filter = '';
   const select = h('select', { id: 'village-filter' });
@@ -121,6 +128,24 @@ async function renderDashboard(root: HTMLElement): Promise<void> {
     ),
   );
 
+  const messagesBody = h('tbody');
+  const messagesCount = h('p', { class: 'field-hint', role: 'status' });
+  const messagesTable = h(
+    'div',
+    { class: 'table-wrap' },
+    h(
+      'table',
+      {},
+      h('caption', { class: 'sr-only' }, 'Alle Nachrichten'),
+      h(
+        'thead',
+        {},
+        h('tr', {}, ...['Ort', 'Name', 'Nachricht', 'Erstellt', 'Aktionen'].map((t) => h('th', { scope: 'col' }, t))),
+      ),
+      messagesBody,
+    ),
+  );
+
   root.replaceChildren(
     page(
       h(
@@ -129,9 +154,14 @@ async function renderDashboard(root: HTMLElement): Promise<void> {
         h('div', { class: 'field inline' }, h('label', { for: 'village-filter' }, 'Ort'), select),
         logout,
       ),
+      h('h2', {}, 'Einträge'),
       mapEl,
       count,
       table,
+      h('h2', { class: 'admin-section' }, 'Nachrichten'),
+      allMessages === null
+        ? h('p', { role: 'alert' }, 'Die Nachrichten konnten nicht geladen werden. Ist die Migration für Nachrichten eingespielt?')
+        : h('div', {}, messagesCount, messagesTable),
     ),
   );
 
@@ -140,7 +170,9 @@ async function renderDashboard(root: HTMLElement): Promise<void> {
   map.setBounds(null); // erst bei Auswahl eines Orts anzeigen
 
   function slugs(): string[] {
-    return [...new Set([...villages.map((v) => v.slug), ...all.map((e) => e.village_slug)])];
+    return [
+      ...new Set([...villages.map((v) => v.slug), ...all.map((e) => e.village_slug), ...(allMessages ?? []).map((m) => m.village_slug)]),
+    ];
   }
   select.replaceChildren(
     h('option', { value: '' }, 'Alle Orte'),
@@ -162,6 +194,63 @@ async function renderDashboard(root: HTMLElement): Promise<void> {
     if (refit) map.fit(entries, findVillage(filter) ?? startVillage);
     count.textContent = `${entries.length} ${entries.length === 1 ? 'Eintrag' : 'Einträge'}`;
     tbody.replaceChildren(...entries.map(row));
+    refreshMessages();
+  }
+
+  function refreshMessages() {
+    if (!allMessages) return;
+    // Pro Ort: angeheftete zuerst, sonst neueste zuerst (wie auf der Karte)
+    const messages = (filter ? allMessages.filter((m) => m.village_slug === filter) : allMessages)
+      .slice()
+      .sort((a, b) => Number(b.is_sticky) - Number(a.is_sticky) || b.created_at.localeCompare(a.created_at));
+    messagesCount.textContent = `${messages.length} ${messages.length === 1 ? 'Nachricht' : 'Nachrichten'}`;
+    messagesBody.replaceChildren(...messages.map(messageRow));
+  }
+
+  function messageRow(message: Message): HTMLElement {
+    const pin = h('button', { type: 'button', class: 'btn secondary small' }, message.is_sticky ? 'Lösen' : '📌 Anheften');
+    pin.setAttribute('aria-label', `Nachricht von ${message.author_name} ${message.is_sticky ? 'lösen' : 'anheften'}`);
+    pin.addEventListener('click', async () => {
+      pin.disabled = true;
+      try {
+        await setMessageSticky(message.id, !message.is_sticky);
+        allMessages = allMessages!.map((m) => (m.id === message.id ? { ...m, is_sticky: !m.is_sticky } : m));
+        refreshMessages();
+        showToast(message.is_sticky ? 'Nachricht gelöst.' : 'Nachricht angeheftet.');
+      } catch (err) {
+        showToast(`Ändern fehlgeschlagen: ${(err as Error).message}`);
+        pin.disabled = false;
+      }
+    });
+    const del = h('button', { type: 'button', class: 'btn danger small' }, 'Löschen');
+    del.setAttribute('aria-label', `Nachricht von ${message.author_name} löschen`);
+    del.addEventListener('click', async () => {
+      if (!(await confirmDialog('Nachricht löschen?', `Nachricht von «${message.author_name}» wirklich löschen?`, 'Ja, löschen'))) return;
+      try {
+        await deleteMessage(message.id);
+        allMessages = allMessages!.filter((m) => m.id !== message.id);
+        refreshMessages();
+        showToast('Nachricht gelöscht.');
+      } catch (err) {
+        showToast(`Löschen fehlgeschlagen: ${(err as Error).message}`);
+      }
+    });
+    return h(
+      'tr',
+      { class: message.is_admin ? 'message-row admin' : 'message-row' },
+      h('td', {}, findVillage(message.village_slug)?.name ?? message.village_slug),
+      h(
+        'td',
+        {},
+        message.author_name,
+        message.is_admin ? h('span', { class: 'badge admin' }, 'Admin') : null,
+        message.is_sticky ? h('span', { class: 'badge sticky' }, '📌') : null,
+      ),
+      // Nur als Text eingefügt, nie als HTML
+      h('td', { class: 'message-body' }, message.body),
+      h('td', {}, formatDateTime(message.created_at)),
+      h('td', {}, h('div', { class: 'actions' }, pin, del)),
+    );
   }
 
   function row(entry: Entry): HTMLElement {
