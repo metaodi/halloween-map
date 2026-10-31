@@ -22,3 +22,10 @@ export function h<K extends keyof HTMLElementTagNameMap>(
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
 }
+
+/** Formats as DD.MM.YYYY HH:mm (local time). */
+export function formatDateTime(iso: string): string {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
