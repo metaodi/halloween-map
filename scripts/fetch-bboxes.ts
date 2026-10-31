@@ -34,7 +34,6 @@ const areas: Record<string, Area[]> = {
   baech: [{ plz: '8806' }],
   freienbach: [{ plz: '8807' }],
   hurden: [{ plz: '8640', place: 'Hurden' }],
-  'wilen-freienbach': [{ plz: '8832', place: 'Wilen' }],
   pfaeffikon: [{ plz: '8808', place: 'Pfäffikon' }],
   hirzel: [{ plz: '8816' }],
   horgen: [{ plz: '8810' }],

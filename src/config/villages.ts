@@ -73,15 +73,6 @@ export const villages: Village[] = [
     active: false,
   },
   {
-    // Ortsteil der Gemeinde Freienbach (Kanton Schwyz)
-    slug: 'wilen-freienbach',
-    name: 'Wilen (Freienbach)',
-    center: [47.195, 8.735],
-    zoom: 14,
-    bbox: [8.719, 47.184, 8.751, 47.206],
-    active: false,
-  },
-  {
     slug: 'hirzel',
     name: 'Hirzel',
     center: [47.2131, 8.6],
