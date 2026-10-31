@@ -1,5 +1,6 @@
 import { contactInfo } from '../components/contactInfo';
-import { messagesEnabled, type Village } from '../config/villages';
+import { messagesEnabled } from '../config/features';
+import type { Village } from '../config/villages';
 import { createMap } from '../components/map';
 import { openDialog } from '../components/dialog';
 import { openDeleteDialog } from '../components/deleteDialog';
