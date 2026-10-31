@@ -31,6 +31,11 @@ const BUFFER = 0.002;
 const areas: Record<string, Area[]> = {
   adliswil: [{ plz: '8134' }],
   au: [{ plz: '8804' }],
+  baech: [{ plz: '8806' }],
+  freienbach: [{ plz: '8807' }],
+  hurden: [{ plz: '8640', place: 'Hurden' }],
+  'wilen-freienbach': [{ plz: '8832', place: 'Wilen' }],
+  pfaeffikon: [{ plz: '8808', place: 'Pfäffikon' }],
   hirzel: [{ plz: '8816' }],
   horgen: [{ plz: '8810' }],
   huenenberg: [{ plz: '6331' }, { plz: '6333' }],
