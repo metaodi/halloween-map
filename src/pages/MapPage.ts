@@ -1,10 +1,11 @@
 import { contactInfo } from '../components/contactInfo';
-import { messagesEnabled, type Village } from '../config/villages';
+import { messagesEnabled } from '../config/features';
+import type { Village } from '../config/villages';
 import { createMap } from '../components/map';
 import { openDialog } from '../components/dialog';
 import { openDeleteDialog } from '../components/deleteDialog';
 import { openEntryForm } from '../components/entryForm';
-import { openMessagesDialog } from '../components/messagesDialog';
+import { createMessagesButton } from '../components/messagesButton';
 import { showToast } from '../components/toast';
 import { villageNotice } from '../components/villageNotice';
 import { fetchEntries, getEntryByToken } from '../lib/supabase/entries';
@@ -119,14 +120,7 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
   root.append(addBtn, infoBtn, h('div', { class: 'map-actions' }, reloadBtn, locateBtn));
 
   if (messagesEnabled(village)) {
-    const messagesBtn = h(
-      'button',
-      { type: 'button', class: 'btn secondary messages-btn' },
-      h('span', { 'aria-hidden': 'true' }, '💬'),
-      h('span', { class: 'messages-btn-label' }, 'Nachrichten'),
-    );
-    messagesBtn.addEventListener('click', () => openMessagesDialog(village));
-    root.append(messagesBtn);
+    root.append(createMessagesButton(village));
     mapEl.classList.add('with-messages');
   }
 

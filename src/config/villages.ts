@@ -1,5 +1,3 @@
-import { features } from './features';
-
 /**
  * Konfiguration der Orte. Einen neuen Ort hinzufügen = einen Eintrag ergänzen.
  * Aufruf der Seite: /?ort=<slug>
@@ -20,7 +18,7 @@ export interface Village {
   notice?: { text: string; link?: { href: string; label: string } };
   /** false = Gemeinde ist noch nicht freigeschaltet: Button ist auf der Übersicht ausgegraut, Tipp zeigt den Kontakthinweis */
   active: boolean;
-  /** Nachrichten für diesen Ort ein-/ausschalten; ohne Angabe gilt `features.messages` (src/config/features.ts) */
+  /** Nachrichten für diesen Ort ein-/ausschalten; ohne Angabe gilt `features.messages` (src/config/features.ts, siehe `messagesEnabled`) */
   messages?: boolean;
 }
 
@@ -155,10 +153,6 @@ export const villages: Village[] = [
 export function findVillage(slug: string | null | undefined): Village | undefined {
   if (!slug) return undefined;
   return villages.find((v) => v.slug === slug);
-}
-
-export function messagesEnabled(village: Village): boolean {
-  return village.messages ?? features.messages;
 }
 
 export function defaultVillage(): Village | undefined {
