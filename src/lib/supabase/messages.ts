@@ -22,6 +22,8 @@ export interface NewMessage {
   village_slug: string;
   author_name: string;
   body: string;
+  /** Löschtoken, in der DB liegt nur sein SHA-256-Hash */
+  token: string;
   /** Wird nur von der DB berücksichtigt, wenn der angemeldete User Admin ist. */
   as_admin: boolean;
 }
@@ -32,6 +34,7 @@ export async function createMessage(message: NewMessage): Promise<string> {
     p_village_slug: message.village_slug,
     p_author_name: message.author_name,
     p_body: message.body,
+    p_token: message.token,
     p_as_admin: message.as_admin,
   });
   if (error) throw new SupabaseRpcError(error.message, error.code);
@@ -50,4 +53,18 @@ export async function deleteMessage(id: string): Promise<void> {
   const { data, error } = await requireSupabase().from('messages').delete().eq('id', id).select('id');
   if (error) throw new Error(error.message);
   if (data.length === 0) throw new Error('Keine Berechtigung oder Nachricht nicht gefunden.');
+}
+
+/** Löscht eine eigene Nachricht mit ihrem Token. `false`, wenn Token und Nachricht nicht zusammenpassen. */
+export async function deleteOwnMessage(id: string, token: string): Promise<boolean> {
+  const { data, error } = await requireSupabase().rpc('delete_own_message', { p_message_id: id, p_token: token });
+  if (error) throw new SupabaseRpcError(error.message, error.code);
+  return data as boolean;
+}
+
+/** Alle Nachrichten aller Orte, neueste zuerst (nur mit Admin-Rechten, sonst leer). */
+export async function fetchAllMessages(): Promise<Message[]> {
+  const { data, error } = await requireSupabase().from('messages').select(COLUMNS).order('created_at', { ascending: false });
+  if (error) throw new Error(error.message);
+  return data as Message[];
 }

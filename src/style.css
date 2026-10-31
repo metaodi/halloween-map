@@ -177,3 +177,10 @@ dialog.modal::backdrop { background: rgba(10, 5, 25, 0.6); }
 .message-form { margin-top: 8px; padding-top: 4px; border-top: 1px solid var(--border); }
 /* Zoom-Steuerung über den Nachrichten-Button schieben */
 .map.with-messages .leaflet-bottom.leaflet-right .leaflet-control-zoom { margin-bottom: 64px; }
+.badge.own { background: #ece6fa; color: var(--text); }
+/* Admin: Nachrichten */
+.page.admin h2 { margin: 20px 0 0; font-size: 1.15rem; }
+.page.admin h2.admin-section { margin-top: 32px; }
+.message-row td .badge { margin-left: 6px; }
+.message-row.admin { background: #e8f0fe; }
+.message-row .message-body { margin: 0; max-width: 420px; }

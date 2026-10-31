@@ -5,7 +5,8 @@ import { sanitizePlainText } from '../lib/sanitize';
 import { currentUserId, isAdmin } from '../lib/supabase/admin';
 import { supabase } from '../lib/supabase/client';
 import { SupabaseRpcError } from '../lib/supabase/entries';
-import { createMessage, deleteMessage, fetchMessages, setMessageSticky } from '../lib/supabase/messages';
+import { createMessage, deleteMessage, deleteOwnMessage, fetchMessages, setMessageSticky } from '../lib/supabase/messages';
+import { generateToken, messageTokens } from '../lib/token';
 import type { Message } from '../lib/types';
 import { confirmDialog } from './confirmDialog';
 import { openDialog } from './dialog';
@@ -62,7 +63,7 @@ export function openMessagesDialog(village: Village): void {
     h('div', { class: 'field' }, h('label', { for: 'message-body' }, 'Nachricht'), body, counter),
     adminField,
     error,
-    h('p', { class: 'privacy' }, 'Nachrichten sind öffentlich sichtbar. Nur Text, keine Formatierung oder Links.'),
+    h('p', { class: 'privacy' }, 'Nachrichten sind öffentlich sichtbar. Nur Text, keine Formatierung oder Links. Deine eigenen Nachrichten kannst du in diesem Browser wieder löschen.'),
     submit,
   );
 
@@ -77,6 +78,22 @@ export function openMessagesDialog(village: Village): void {
   function item(m: Message): HTMLElement {
     const classes = ['message', m.is_admin ? 'admin' : '', m.is_sticky ? 'sticky' : ''].filter(Boolean).join(' ');
     const actions: HTMLElement[] = [];
+    const ownToken = messageTokens.tokenFor(m.id);
+    if (ownToken && !admin) {
+      const delOwn = h('button', { type: 'button', class: 'btn danger small' }, 'Meine Nachricht löschen');
+      delOwn.addEventListener('click', async () => {
+        if (!(await confirmDialog('Nachricht löschen?', 'Möchtest du deine Nachricht löschen? Das kann nicht rückgängig gemacht werden.', 'Ja, löschen'))) return;
+        try {
+          const deleted = await deleteOwnMessage(m.id, ownToken);
+          messageTokens.forget(m.id);
+          showToast(deleted ? 'Deine Nachricht wurde gelöscht.' : 'Diese Nachricht existiert nicht mehr.');
+          await load();
+        } catch {
+          showToast('Die Nachricht konnte nicht gelöscht werden. Bitte versuche es erneut.');
+        }
+      });
+      actions.push(delOwn);
+    }
     if (admin) {
       const pin = h('button', { type: 'button', class: 'btn secondary small' }, m.is_sticky ? 'Lösen' : '📌 Anheften');
       pin.addEventListener('click', async () => {
@@ -103,13 +120,14 @@ export function openMessagesDialog(village: Village): void {
     }
     return h(
       'li',
-      { class: classes },
+      { class: ownToken ? `${classes} own` : classes },
       h(
         'div',
         { class: 'message-meta' },
         h('strong', {}, m.author_name),
         m.is_admin ? h('span', { class: 'badge admin' }, 'Admin') : null,
         m.is_sticky ? h('span', { class: 'badge sticky' }, '📌 Angeheftet') : null,
+        ownToken ? h('span', { class: 'badge own' }, 'Von dir') : null,
         h('time', { datetime: m.created_at }, formatDateTime(m.created_at)),
       ),
       // Nur als Text eingefügt (h → textContent), nie als HTML
@@ -149,7 +167,15 @@ export function openMessagesDialog(village: Village): void {
     }
     submit.disabled = true;
     try {
-      await createMessage({ village_slug: village.slug, author_name: cleanName, body: cleanBody, as_admin: admin && asAdmin.checked });
+      const token = generateToken();
+      const id = await createMessage({
+        village_slug: village.slug,
+        author_name: cleanName,
+        body: cleanBody,
+        token,
+        as_admin: admin && asAdmin.checked,
+      });
+      messageTokens.remember(id, token);
       saveNickname(cleanName);
       name.value = cleanName;
       body.value = '';

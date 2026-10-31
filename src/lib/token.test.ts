@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { forgetToken, generateToken, loadTokens, rememberToken, sha256Hex, tokenFor } from './token';
+import { forgetToken, generateToken, loadTokens, messageTokens, rememberToken, sha256Hex, tokenFor } from './token';
 
 describe('sha256Hex', () => {
   it('entspricht den bekannten SHA-256-Testvektoren (wie digest(..., \'sha256\') in Postgres)', async () => {
@@ -38,6 +38,16 @@ describe('Token-Speicher', () => {
     expect(tokenFor('e1')).toBe('t1');
     forgetToken('e1');
     expect(loadTokens()).toEqual({ e2: 't2' });
+  });
+
+  it('speichert Nachrichten-Tokens getrennt von den Eintrags-Tokens', () => {
+    rememberToken('e1', 't1');
+    messageTokens.remember('m1', 'mt1');
+    expect(messageTokens.tokenFor('m1')).toBe('mt1');
+    expect(tokenFor('m1')).toBeUndefined();
+    messageTokens.forget('m1');
+    expect(messageTokens.load()).toEqual({});
+    expect(loadTokens()).toEqual({ e1: 't1' });
   });
 
   it('übersteht kaputte Daten und fehlendes localStorage', () => {
