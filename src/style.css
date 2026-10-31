@@ -127,6 +127,12 @@ dialog.modal::backdrop { background: rgba(10, 5, 25, 0.6); }
 .page.admin { max-width: 1000px; margin: 0 auto; min-height: 100%; }
 .page.admin h1 { margin-top: 0; }
 .admin-toolbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px; }
+.admin-nav { position: sticky; top: 0; z-index: 1000; display: flex; gap: 8px; margin: 12px 0 0; padding: 8px 0; background: var(--bg); }
+.admin-nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 8px; background: var(--surface); color: var(--accent-strong); font-weight: 600; text-decoration: none; }
+.admin-nav a:hover { text-decoration: underline; }
+.page.admin h2 { scroll-margin-top: 72px; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 .field.inline { margin: 0; }
 .field.inline select { min-height: 44px; padding: 0 10px; font: inherit; border: 1px solid #6f6885; border-radius: 8px; background: #fff; }
 .admin-map { height: 320px; margin: 16px 0 8px; border-radius: var(--radius); overflow: hidden; position: relative; }
