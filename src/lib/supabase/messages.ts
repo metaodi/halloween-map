@@ -18,6 +18,19 @@ export async function fetchMessages(villageSlug: string): Promise<Message[]> {
   return data as Message[];
 }
 
+/** Zeitpunkt der neuesten Nachricht eines Orts (für den Hinweis auf ungelesene), oder `null`. */
+export async function fetchLatestMessageAt(villageSlug: string): Promise<string | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('public_messages')
+    .select('created_at')
+    .eq('village_slug', villageSlug)
+    .order('created_at', { ascending: false })
+    .limit(1);
+  if (error) throw new Error(error.message);
+  return (data as { created_at: string }[])[0]?.created_at ?? null;
+}
+
 export interface NewMessage {
   village_slug: string;
   author_name: string;

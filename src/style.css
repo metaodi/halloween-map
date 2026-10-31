@@ -184,3 +184,13 @@ dialog.modal::backdrop { background: rgba(10, 5, 25, 0.6); }
 .message-row td .badge { margin-left: 6px; }
 .message-row.admin { background: #e8f0fe; }
 .message-row .message-body { margin: 0; max-width: 420px; }
+/* Roter Punkt für ungelesene Nachrichten */
+.messages-btn { overflow: visible; }
+.unread-dot {
+  position: absolute; top: -4px; right: -4px;
+  width: 16px; height: 16px; border-radius: 50%;
+  background: #dc2626; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+@keyframes message-new { from { background: #fef3c7; } }
+.message.new { animation: message-new 3s ease-out; }
+@media (prefers-reduced-motion: reduce) { .message.new { animation: none; outline: 2px solid #f59e0b; } }

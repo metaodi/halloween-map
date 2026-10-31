@@ -5,4 +5,6 @@
 export const features = {
   /** Nachrichten-Pinnwand pro Ort (Button «Nachrichten» auf der Karte) */
   messages: true,
+  /** Wie oft (Sekunden) auf neue Nachrichten geprüft wird, solange die Seite sichtbar ist */
+  messagesPollSeconds: 60,
 };

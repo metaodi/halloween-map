@@ -1,5 +1,6 @@
 import type { Village } from '../config/villages';
 import { formatDateTime, h } from '../lib/dom';
+import { markSeen } from '../lib/messageSeen';
 import { loadNickname, saveNickname } from '../lib/nickname';
 import { sanitizePlainText } from '../lib/sanitize';
 import { currentUserId, isAdmin } from '../lib/supabase/admin';
@@ -33,8 +34,17 @@ function checkAdmin(): Promise<boolean> {
   return adminCheck;
 }
 
-/** Modal mit allen Nachrichten eines Orts (neueste oben, angeheftete zuoberst) und Formular unten. */
-export function openMessagesDialog(village: Village): void {
+export interface MessagesDialogHandle {
+  el: HTMLDialogElement;
+  /** Liste neu laden (z. B. beim automatischen Aktualisieren) */
+  refresh(): Promise<void>;
+}
+
+/**
+ * Modal mit allen Nachrichten eines Orts (neueste oben, angeheftete zuoberst) und Formular unten.
+ * Nach jedem Laden gelten die angezeigten Nachrichten als gesehen (`onSeen`).
+ */
+export function openMessagesDialog(village: Village, options: { onSeen?: () => void } = {}): MessagesDialogHandle {
   let messages: Message[] = [];
   let admin = false;
 
@@ -67,7 +77,7 @@ export function openMessagesDialog(village: Village): void {
     submit,
   );
 
-  openDialog(`Nachrichten ${village.name}`, h('div', { class: 'messages' }, status, list, form));
+  const dialog = openDialog(`Nachrichten ${village.name}`, h('div', { class: 'messages' }, status, list, form));
 
   function render() {
     status.textContent = messages.length === 0 ? 'Noch keine Nachrichten. Schreib die erste!' : '';
@@ -138,8 +148,19 @@ export function openMessagesDialog(village: Village): void {
 
   async function load() {
     try {
+      const previousIds = new Set(messages.map((m) => m.id));
+      const scrollTop = list.scrollTop;
       messages = await fetchMessages(village.slug);
       render();
+      list.scrollTop = scrollTop;
+      // Beim automatischen Aktualisieren neue Nachrichten kurz hervorheben
+      if (previousIds.size > 0) {
+        for (const [i, m] of messages.entries()) {
+          if (!previousIds.has(m.id)) list.children[i]?.classList.add('new');
+        }
+      }
+      markSeen(village.slug, newestCreatedAt(messages));
+      options.onSeen?.();
     } catch {
       status.hidden = false;
       status.textContent = 'Die Nachrichten konnten nicht geladen werden.';
@@ -195,9 +216,25 @@ export function openMessagesDialog(village: Village): void {
     }
   });
 
-  void (async () => {
+  const initial = (async () => {
     admin = await checkAdmin();
     adminField.hidden = !admin;
     await load();
   })();
+
+  return {
+    el: dialog.el,
+    async refresh() {
+      await initial;
+      await load();
+    },
+  };
+}
+
+function newestCreatedAt(messages: Message[]): string | undefined {
+  // Angeheftete stehen oben, daher nicht einfach das erste Element nehmen
+  return messages.reduce<string | undefined>(
+    (max, m) => (!max || Date.parse(m.created_at) > Date.parse(max) ? m.created_at : max),
+    undefined,
+  );
 }
