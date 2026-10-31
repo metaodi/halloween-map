@@ -154,11 +154,17 @@ async function renderDashboard(root: HTMLElement): Promise<void> {
         h('div', { class: 'field inline' }, h('label', { for: 'village-filter' }, 'Ort'), select),
         logout,
       ),
-      h('h2', {}, 'Einträge'),
+      h(
+        'nav',
+        { class: 'admin-nav', 'aria-label': 'Bereiche' },
+        h('a', { href: '#eintraege' }, 'Einträge'),
+        h('a', { href: '#nachrichten' }, 'Nachrichten'),
+      ),
+      h('h2', { id: 'eintraege' }, 'Einträge'),
       mapEl,
       count,
       table,
-      h('h2', { class: 'admin-section' }, 'Nachrichten'),
+      h('h2', { id: 'nachrichten', class: 'admin-section' }, 'Nachrichten'),
       allMessages === null
         ? h('p', { role: 'alert' }, 'Die Nachrichten konnten nicht geladen werden. Ist die Migration für Nachrichten eingespielt?')
         : h('div', {}, messagesCount, messagesTable),
