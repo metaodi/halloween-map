@@ -46,6 +46,33 @@ export const villages: Village[] = [
     active: true,
   },
   {
+    // Ortsteil der Gemeinde Freienbach (Kanton Schwyz)
+    slug: 'baech',
+    name: 'Bäch (Freienbach)',
+    center: [47.205, 8.728],
+    zoom: 14,
+    bbox: [8.709, 47.195, 8.748, 47.215],
+    active: false,
+  },
+  {
+    // Kanton Schwyz
+    slug: 'freienbach',
+    name: 'Freienbach',
+    center: [47.2066, 8.756],
+    zoom: 14,
+    bbox: [8.739, 47.193, 8.773, 47.22],
+    active: true,
+  },
+  {
+    // Ortsteil der Gemeinde Freienbach (Kanton Schwyz)
+    slug: 'hurden',
+    name: 'Hurden (Freienbach)',
+    center: [47.2137, 8.803],
+    zoom: 14,
+    bbox: [8.787, 47.204, 8.819, 47.224],
+    active: false,
+  },
+  {
     slug: 'hirzel',
     name: 'Hirzel',
     center: [47.2131, 8.6],
@@ -95,6 +122,15 @@ export const villages: Village[] = [
     bbox: [8.551, 47.26, 8.603, 47.289],
     active: false,
     messages: false,
+  },
+  {
+    // Ortsteil der Gemeinde Freienbach (Kanton Schwyz)
+    slug: 'pfaeffikon',
+    name: 'Pfäffikon SZ',
+    center: [47.2, 8.778],
+    zoom: 14,
+    bbox: [8.736, 47.17, 8.811, 47.226],
+    active: false,
   },
   {
     slug: 'richterswil',
