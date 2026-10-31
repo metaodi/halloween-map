@@ -49,36 +49,36 @@ export const villages: Village[] = [
     // Ortsteil der Gemeinde Freienbach (Kanton Schwyz)
     slug: 'baech',
     name: 'Bäch (Freienbach)',
-    center: [47.1935, 8.735],
+    center: [47.205, 8.728],
     zoom: 14,
-    bbox: [8.715, 47.178, 8.755, 47.205],
+    bbox: [8.709, 47.195, 8.748, 47.215],
     active: false,
   },
   {
     // Kanton Schwyz
     slug: 'freienbach',
     name: 'Freienbach',
-    center: [47.2038, 8.7741],
+    center: [47.2066, 8.756],
     zoom: 14,
-    bbox: [8.755, 47.19, 8.795, 47.216],
+    bbox: [8.739, 47.193, 8.773, 47.22],
     active: true,
   },
   {
     // Ortsteil der Gemeinde Freienbach (Kanton Schwyz)
     slug: 'hurden',
     name: 'Hurden (Freienbach)',
-    center: [47.202, 8.83],
+    center: [47.2137, 8.803],
     zoom: 14,
-    bbox: [8.805, 47.19, 8.85, 47.215],
+    bbox: [8.787, 47.204, 8.819, 47.224],
     active: false,
   },
   {
     // Ortsteil der Gemeinde Freienbach (Kanton Schwyz)
     slug: 'wilen-freienbach',
     name: 'Wilen (Freienbach)',
-    center: [47.195, 8.76],
+    center: [47.195, 8.735],
     zoom: 14,
-    bbox: [8.745, 47.18, 8.78, 47.205],
+    bbox: [8.719, 47.184, 8.751, 47.206],
     active: false,
   },
   {
@@ -138,7 +138,7 @@ export const villages: Village[] = [
     name: 'Pfäffikon (Freienbach)',
     center: [47.2, 8.778],
     zoom: 14,
-    bbox: [8.76, 47.19, 8.8, 47.212],
+    bbox: [8.736, 47.17, 8.811, 47.226],
     active: false,
   },
   {
