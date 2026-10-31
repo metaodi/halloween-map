@@ -79,6 +79,7 @@ export const villages: Village[] = [
     zoom: 14,
     bbox: [8.531, 47.307, 8.569, 47.344],
     active: false,
+    messages: false,
   },
   {
     slug: 'langnau-am-albis',
@@ -95,6 +96,7 @@ export const villages: Village[] = [
     zoom: 14,
     bbox: [8.551, 47.26, 8.603, 47.289],
     active: false,
+    messages: false,
   },
   {
     slug: 'richterswil',
@@ -121,10 +123,6 @@ export const villages: Village[] = [
     zoom: 14,
     bbox: [8.545, 47.274, 8.593, 47.309],
     active: true,
-    notice: {
-      text: 'Für Thalwil gibt es auch die Facebook-Gruppe «Thalwil Halloween 2026» mit einer eigenen Karte. Schau auch dort vorbei!',
-      link: { href: 'https://www.facebook.com/groups/299732252995490/', label: 'Zur Facebook-Gruppe' },
-    },
   },
   {
     slug: 'waedenswil',
