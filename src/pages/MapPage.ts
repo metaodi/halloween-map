@@ -1,9 +1,10 @@
 import { contactInfo } from '../components/contactInfo';
-import type { Village } from '../config/villages';
+import { messagesEnabled, type Village } from '../config/villages';
 import { createMap } from '../components/map';
 import { openDialog } from '../components/dialog';
 import { openDeleteDialog } from '../components/deleteDialog';
 import { openEntryForm } from '../components/entryForm';
+import { openMessagesDialog } from '../components/messagesDialog';
 import { showToast } from '../components/toast';
 import { villageNotice } from '../components/villageNotice';
 import { fetchEntries, getEntryByToken } from '../lib/supabase/entries';
@@ -117,6 +118,18 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
   infoBtn.addEventListener('click', () => openDialog('Info und Datenschutz', infoContent(village)));
   root.append(addBtn, infoBtn, h('div', { class: 'map-actions' }, reloadBtn, locateBtn));
 
+  if (messagesEnabled(village)) {
+    const messagesBtn = h(
+      'button',
+      { type: 'button', class: 'btn secondary messages-btn' },
+      h('span', { 'aria-hidden': 'true' }, '💬'),
+      h('span', { class: 'messages-btn-label' }, 'Nachrichten'),
+    );
+    messagesBtn.addEventListener('click', () => openMessagesDialog(village));
+    root.append(messagesBtn);
+    mapEl.classList.add('with-messages');
+  }
+
   void load();
   if (deleteToken) void startDeleteFlow(deleteToken);
 
@@ -154,6 +167,9 @@ function infoContent(village: Village): HTMLElement {
       h('li', {}, 'Beides ist öffentlich auf der Karte sichtbar.'),
       h('li', {}, 'Du kannst deinen Eintrag jederzeit mit deinem persönlichen Löschlink entfernen.'),
       h('li', {}, 'Dein Eintrag bleibt gespeichert, bis du ihn widerrufst (z. B. für das nächste Jahr).'),
+      messagesEnabled(village)
+        ? h('li', {}, 'Nachrichten sind öffentlich sichtbar, mit dem Namen, den du selbst wählst. Ein Admin kann sie löschen.')
+        : null,
     ),
     h('h3', {}, 'Kontakt'),
     contactInfo(),

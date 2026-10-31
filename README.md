@@ -10,7 +10,7 @@ Trick-or-Treat-Karte für Dörfer und Quartiere: Familien tragen ihre Adresse se
 ## Supabase einrichten
 
 1. **Projekt anlegen** auf supabase.com.
-2. **Migration einspielen:** Im Dashboard unter *SQL Editor* den Inhalt von `supabase/migrations/20261024000000_init.sql` ausführen (oder mit der Supabase-CLI `supabase db push`).
+2. **Migration einspielen:** Im Dashboard unter *SQL Editor* den Inhalt aller Dateien in `supabase/migrations/` der Reihe nach ausführen (`20261024000000_init.sql`, dann `20261031000000_messages.sql`) (oder mit der Supabase-CLI `supabase db push`).
 3. **Registrierung deaktivieren:** *Authentication → Sign In / Providers → «Allow new users to sign up»* ausschalten.
 4. **Admin-User anlegen:** *Authentication → Users → Add user* (E-Mail + Passwort, «Auto Confirm User» aktivieren).
 5. **Admin freischalten:** Die User-ID (UUID) des neuen Users kopieren und im SQL Editor ausführen:
@@ -25,6 +25,7 @@ Trick-or-Treat-Karte für Dörfer und Quartiere: Familien tragen ihre Adresse se
 - Schreiben und Löschen nur über die RPCs `create_entry`, `get_entry_by_token` und `delete_entry`. Der Löschtoken wird im Browser mit `crypto.randomUUID()` erzeugt, in der DB liegt nur sein SHA-256-Hash.
 - `create_entry` prüft Längen, Koordinaten (Plausibilitätsbereich Schweiz inkl. Grenzregion) und das Format des Orts-Slugs und erlaubt max. 5 Einträge pro Minute und Ort.
 - Admins (`auth.uid()` steht in `admins`) haben per Policy volle Rechte auf `entries`. Die Prüfung läuft in der Datenbank, nicht im Client.
+- **Nachrichten:** Lesen über die View `public_messages`, Schreiben nur über die RPC `create_message`. Sie bereinigt Name und Text mit `sanitize_plain_text` (entfernt HTML-Tags, BBCode, Steuer- und unsichtbare Zeichen; Markdown wird nicht interpretiert), prüft Längen (Name ≤ 30, Text ≤ 500 Zeichen) und erlaubt max. 10 Nachrichten pro Minute und Ort. Das Admin-Flag setzt nur die DB, wenn der angemeldete User in `admins` steht. Anheften (sticky) und Löschen dürfen per Policy nur Admins. Angezeigt wird ausschliesslich als Text (kein `innerHTML`).
 
 ## Konfiguration
 
@@ -38,6 +39,8 @@ cp .env.example .env
 | `VITE_SUPABASE_ANON_KEY` | anon public key (darf im Frontend stehen, die Daten schützt RLS) |
 | `VITE_DEFAULT_VILLAGE` | Slug des Orts ohne `?ort=…`. Leer lassen, um eine Ort-Auswahlseite zu zeigen |
 | `VITE_GEOCODER` | `swisstopo` (Default) oder `photon` |
+
+Nachrichten pro Ort (Button «Nachrichten» auf der Karte) werden in `src/config/features.ts` global ein- oder ausgeschaltet (`messages: true/false`) und lassen sich pro Ort in `src/config/villages.ts` mit `messages: false` bzw. `true` überschreiben. Ist man im selben Browser unter `?admin` als Admin angemeldet, kann man im Nachrichten-Dialog Admin-Nachrichten (blau markiert) senden sowie Nachrichten anheften und löschen.
 
 Ohne Supabase-Variablen zeigt die Karte beim lokalen Entwickeln Demo-Einträge; Eintragen und Admin funktionieren dann nicht.
 
@@ -109,6 +112,7 @@ Falls ein früher eingerichteter `pg_cron`-Job `halloween-cleanup` existiert, mu
 ```
 src/
   config/villages.ts      Orte
+  config/features.ts      Funktionen ein/aus (z. B. Nachrichten)
   lib/supabase/           Client, Einträge (öffentlich), Admin
   lib/geocoding/          GeocoderProvider, swisstopo, Photon
   lib/token.ts            Token-Erzeugung, Hash, localStorage
