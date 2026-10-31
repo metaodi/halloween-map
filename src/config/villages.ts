@@ -46,6 +46,15 @@ export const villages: Village[] = [
     active: true,
   },
   {
+    // Kanton Schwyz (inkl. Pfäffikon, Bäch, Wilen, Hurden)
+    slug: 'freienbach',
+    name: 'Freienbach',
+    center: [47.2038, 8.7741],
+    zoom: 14,
+    bbox: [8.715, 47.17, 8.845, 47.225],
+    active: true,
+  },
+  {
     slug: 'hirzel',
     name: 'Hirzel',
     center: [47.2131, 8.6],
