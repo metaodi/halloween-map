@@ -133,6 +133,15 @@ export const villages: Village[] = [
     messages: false,
   },
   {
+    // Ortsteil der Gemeinde Freienbach (Kanton Schwyz)
+    slug: 'pfaeffikon',
+    name: 'Pfäffikon (Freienbach)',
+    center: [47.2, 8.778],
+    zoom: 14,
+    bbox: [8.76, 47.19, 8.8, 47.212],
+    active: false,
+  },
+  {
     slug: 'richterswil',
     name: 'Richterswil',
     center: [47.201, 8.6994],
