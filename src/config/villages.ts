@@ -103,8 +103,7 @@ export const villages: Village[] = [
     center: [47.3235, 8.5446],
     zoom: 14,
     bbox: [8.531, 47.307, 8.569, 47.344],
-    active: false,
-    messages: false,
+    active: true,
   },
   {
     slug: 'langnau-am-albis',
