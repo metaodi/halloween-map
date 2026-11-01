@@ -188,9 +188,9 @@ export const villages: Village[] = [
     // Quartier der Stadt Zürich (Kreis 2), PLZ 8041
     slug: 'leimbach',
     name: 'Leimbach (Zürich)',
-    center: [47.3175, 8.5185],
+    center: [47.3300, 8.5150],
     zoom: 14,
-    bbox: [8.503, 47.302, 8.535, 47.329],
+    bbox: [8.498, 47.317, 8.533, 47.355],
     active: true,
   },
 ];
