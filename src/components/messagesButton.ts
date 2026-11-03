@@ -14,7 +14,7 @@ export function createMessagesButton(village: Village): HTMLButtonElement {
   const dot = h('span', { class: 'unread-dot', hidden: true }, h('span', { class: 'sr-only' }, ' (neue Nachrichten)'));
   const btn = h(
     'button',
-    { type: 'button', class: 'btn secondary messages-btn' },
+    { type: 'button', class: 'btn secondary map-btn messages-btn', 'aria-label': 'Nachrichten' },
     h('span', { 'aria-hidden': 'true' }, '💬'),
     h('span', { class: 'messages-btn-label' }, 'Nachrichten'),
     dot,

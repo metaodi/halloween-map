@@ -140,12 +140,11 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
   });
   const infoBtn = h('button', { type: 'button', class: 'btn secondary info-btn', 'aria-label': 'Info und Datenschutz' }, 'ℹ️ Info');
   infoBtn.addEventListener('click', () => openDialog('Info und Datenschutz', infoContent(village)));
-  root.append(addBtn, infoBtn, h('div', { class: 'map-actions' }, reloadBtn, locateBtn));
-
-  if (messagesEnabled(village)) {
-    root.append(createMessagesButton(village));
-    mapEl.classList.add('with-messages');
-  }
+  // Reihenfolge: Aktualisieren, Nachrichten (falls aktiv), Eigene Position
+  const actions = [reloadBtn];
+  if (messagesEnabled(village)) actions.push(createMessagesButton(village));
+  actions.push(locateBtn);
+  root.append(addBtn, infoBtn, h('div', { class: 'map-actions' }, ...actions));
 
   void load();
   if (deleteToken) void startDeleteFlow(deleteToken);

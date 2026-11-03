@@ -158,17 +158,9 @@ html { scroll-behavior: smooth; }
 [hidden] { display: none !important; }
 
 /* Nachrichten */
-.messages-btn {
-  position: fixed; z-index: 600; right: 16px;
-  bottom: calc(env(safe-area-inset-bottom) + 16px);
-  min-width: 52px; padding: 0 14px; font-size: 1.3rem; box-shadow: var(--shadow);
-}
-.messages-btn-label { font-size: 1rem; }
-/* Schmale Bildschirme: nur das Symbol (neben dem Eintragen-Button), Label bleibt für Screenreader */
-@media (max-width: 599px) {
-  .messages-btn { padding: 0; }
-  .messages-btn-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-}
+/* Sitzt in .map-actions zwischen «Aktualisieren» und «Eigene Position»; nur Symbol, Label für Screenreader */
+.messages-btn { position: relative; }
+.messages-btn-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .message-list {
   list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px;
   max-height: min(45dvh, 420px); overflow-y: auto;
@@ -184,8 +176,6 @@ html { scroll-behavior: smooth; }
 .badge.admin { background: #1d4ed8; color: #fff; }
 .badge.sticky { background: #fde68a; color: var(--text); }
 .message-form { margin-top: 8px; padding-top: 4px; border-top: 1px solid var(--border); }
-/* Zoom-Steuerung über den Nachrichten-Button schieben */
-.map.with-messages .leaflet-bottom.leaflet-right .leaflet-control-zoom { margin-bottom: 64px; }
 .badge.own { background: #ece6fa; color: var(--text); }
 /* Admin: Nachrichten */
 .page.admin h2 { margin: 20px 0 0; font-size: 1.15rem; }
