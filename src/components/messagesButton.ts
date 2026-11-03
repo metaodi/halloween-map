@@ -1,6 +1,7 @@
 import { features } from '../config/features';
 import type { Village } from '../config/villages';
 import { h } from '../lib/dom';
+import { icon } from '../lib/icons';
 import { isNewer, lastSeenAt } from '../lib/messageSeen';
 import { fetchLatestMessageAt } from '../lib/supabase/messages';
 import { openMessagesDialog, type MessagesDialogHandle } from './messagesDialog';
@@ -15,7 +16,7 @@ export function createMessagesButton(village: Village): HTMLButtonElement {
   const btn = h(
     'button',
     { type: 'button', class: 'btn secondary map-btn messages-btn', 'aria-label': 'Nachrichten' },
-    h('span', { 'aria-hidden': 'true' }, '💬'),
+    icon('message'),
     h('span', { class: 'messages-btn-label' }, 'Nachrichten'),
     dot,
   );

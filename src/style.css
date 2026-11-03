@@ -154,6 +154,9 @@ html { scroll-behavior: smooth; }
   display: grid; gap: 8px;
 }
 .map-btn { min-width: 44px; padding: 0; font-size: 1.3rem; box-shadow: var(--shadow); }
+.map-btn .icon { width: 24px; height: 24px; }
+.info-btn { display: inline-flex; align-items: center; gap: 4px; }
+.info-btn .icon { width: 20px; height: 20px; flex: none; }
 
 [hidden] { display: none !important; }
 

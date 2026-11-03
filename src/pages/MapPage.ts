@@ -5,6 +5,7 @@ import { createMap } from '../components/map';
 import { openDialog } from '../components/dialog';
 import { openDeleteDialog } from '../components/deleteDialog';
 import { openEditEntryForm, openEntryForm } from '../components/entryForm';
+import { icon } from '../lib/icons';
 import { createMessagesButton } from '../components/messagesButton';
 import { showToast } from '../components/toast';
 import { villageNotice } from '../components/villageNotice';
@@ -71,13 +72,13 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
     }
   }
 
-  const reloadBtn = h('button', { type: 'button', class: 'btn secondary map-btn', 'aria-label': 'Einträge neu laden', title: 'Einträge neu laden' }, '🔄');
+  const reloadBtn = h('button', { type: 'button', class: 'btn secondary map-btn', 'aria-label': 'Einträge neu laden', title: 'Einträge neu laden' }, icon('reload'));
   reloadBtn.addEventListener('click', () => void load(true));
 
   // Eigene Position: wird erst nach dem ersten Klick abgefragt (Berechtigungsdialog nur auf Wunsch)
   let watchId: number | null = null;
   let centerOnFirstFix = false;
-  const locateBtn = h('button', { type: 'button', class: 'btn secondary map-btn', 'aria-label': 'Auf meine Position zentrieren', title: 'Auf meine Position zentrieren' }, '📍');
+  const locateBtn = h('button', { type: 'button', class: 'btn secondary map-btn', 'aria-label': 'Auf meine Position zentrieren', title: 'Auf meine Position zentrieren' }, icon('locate'));
   locateBtn.addEventListener('click', () => {
     if (!('geolocation' in navigator)) {
       showToast('Dein Gerät unterstützt keine Standortbestimmung.');
@@ -138,7 +139,7 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
       map.openPopup(created.id);
     });
   });
-  const infoBtn = h('button', { type: 'button', class: 'btn secondary info-btn', 'aria-label': 'Info und Datenschutz' }, 'ℹ️ Info');
+  const infoBtn = h('button', { type: 'button', class: 'btn secondary info-btn', 'aria-label': 'Info und Datenschutz' }, icon('info'), ' Info');
   infoBtn.addEventListener('click', () => openDialog('Info und Datenschutz', infoContent(village)));
   // Reihenfolge: Aktualisieren, Nachrichten (falls aktiv), Eigene Position
   const actions = [reloadBtn];
