@@ -4,7 +4,7 @@ import type { Village } from '../config/villages';
 import { createMap } from '../components/map';
 import { openDialog } from '../components/dialog';
 import { openDeleteDialog } from '../components/deleteDialog';
-import { openEntryForm } from '../components/entryForm';
+import { openEditEntryForm, openEntryForm } from '../components/entryForm';
 import { createMessagesButton } from '../components/messagesButton';
 import { showToast } from '../components/toast';
 import { villageNotice } from '../components/villageNotice';
@@ -27,13 +27,24 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
 
   let entries: Entry[] = [];
 
+  /** Eigener Eintrag in diesem Ort (Token im Browser bekannt). Pro Ort nur einer; in anderen Orten ist ein weiterer möglich. */
+  function ownEntry(): Entry | undefined {
+    return entries.find((e) => tokenFor(e.id));
+  }
+
+  function refresh() {
+    map.setEntries(entries);
+    addBtn.textContent = ownEntry() ? '✏️ Meine Adresse editieren' : '🎃 Meine Adresse eintragen';
+  }
+
   function onDeleted(id: string) {
     entries = entries.filter((e) => e.id !== id);
-    map.setEntries(entries);
+    refresh();
     showToast('Dein Eintrag wurde gelöscht.');
   }
 
   const map = createMap(mapEl, village, {
+    isOwn: (entry) => Boolean(tokenFor(entry.id)),
     // Eigene Einträge (Token in diesem Browser bekannt) bekommen im Popup einen Löschen-Button
     popupExtras(entry) {
       const token = tokenFor(entry.id);
@@ -51,7 +62,7 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
     reloadBtn.disabled = true;
     try {
       entries = await fetchEntries(village);
-      map.setEntries(entries);
+      refresh();
       if (manual) showToast('Einträge aktualisiert.');
     } catch {
       showToast('Die Einträge konnten nicht geladen werden. Bitte versuche es erneut.');
@@ -108,9 +119,21 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
       showToast(`Einträge für ${village.name} sind noch nicht freigeschaltet. Bitte kontaktiere Stefan Oderbolz (stefan.oderbolz@metaodi.ch).`);
       return;
     }
+    const own = ownEntry();
+    const token = own && tokenFor(own.id);
+    if (own && token) {
+      openEditEntryForm(village, own, token, (updated) => {
+        entries = entries.map((e) => (e.id === updated.id ? updated : e));
+        refresh();
+        map.focus(updated);
+        map.openPopup(updated.id);
+        showToast('Deine Adresse wurde aktualisiert.');
+      });
+      return;
+    }
     openEntryForm(village, (created) => {
       entries = [...entries, { ...created, village_slug: village.slug, created_at: new Date().toISOString() }];
-      map.setEntries(entries);
+      refresh();
       map.focus(created);
       map.openPopup(created.id);
     });
