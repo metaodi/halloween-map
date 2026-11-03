@@ -74,3 +74,24 @@ export async function deleteEntry(entryId: string, token: string): Promise<boole
   if (error) throw new SupabaseRpcError(error.message, error.code);
   return data as boolean;
 }
+
+export interface OwnEntryUpdate {
+  address_label: string;
+  lat: number;
+  lng: number;
+  note: string | null;
+}
+
+/** Bearbeitet den eigenen Eintrag über `update_entry`. `false`, wenn Token und Eintrag nicht zusammenpassen. */
+export async function updateOwnEntry(entryId: string, token: string, update: OwnEntryUpdate): Promise<boolean> {
+  const { data, error } = await requireSupabase().rpc('update_entry', {
+    p_entry_id: entryId,
+    p_token: token,
+    p_address_label: update.address_label,
+    p_lat: update.lat,
+    p_lng: update.lng,
+    p_note: update.note,
+  });
+  if (error) throw new SupabaseRpcError(error.message, error.code);
+  return data as boolean;
+}

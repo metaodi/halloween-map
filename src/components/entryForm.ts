@@ -1,7 +1,8 @@
 import type { Village } from '../config/villages';
+import type { Entry } from '../lib/types';
 import { h } from '../lib/dom';
 import { createGeocoder } from '../lib/geocoding';
-import { createEntry, SupabaseRpcError } from '../lib/supabase/entries';
+import { createEntry, SupabaseRpcError, updateOwnEntry } from '../lib/supabase/entries';
 import { generateToken, rememberToken } from '../lib/token';
 import { createAddressAutocomplete } from './addressAutocomplete';
 import { openDialog } from './dialog';
@@ -163,4 +164,63 @@ function openConfirmation(village: Village, created: CreatedEntry): void {
   );
   const dialog = openDialog('Eintrag gespeichert', content);
   done.addEventListener('click', () => dialog.close());
+}
+
+/** Öffnet das Formular «Meine Adresse editieren» für den eigenen Eintrag. */
+export function openEditEntryForm(village: Village, entry: Entry, token: string, onUpdated: (entry: Entry) => void): void {
+  const geocoder = createGeocoder();
+  const autocomplete = createAddressAutocomplete(geocoder, village.bbox);
+  autocomplete.setSelected({ label: entry.address_label, lat: entry.lat, lng: entry.lng });
+
+  const note = h('textarea', { id: 'entry-note', maxlength: NOTE_MAX, rows: 2, placeholder: 'z. B. ab 17 Uhr, bitte klingeln' });
+  note.value = entry.note ?? '';
+  const counter = h('span', { class: 'field-hint', 'aria-hidden': 'true' }, `${note.value.length}/${NOTE_MAX}`);
+  note.addEventListener('input', () => (counter.textContent = `${note.value.length}/${NOTE_MAX}`));
+
+  const error = h('p', { class: 'form-error', role: 'alert' });
+  const submit = h('button', { type: 'submit', class: 'btn' }, 'Speichern');
+
+  const form = h(
+    'form',
+    { novalidate: true },
+    villageNotice(village),
+    h('div', { class: 'field' }, h('label', { for: autocomplete.input.id }, 'Adresse'), autocomplete.el),
+    h('div', { class: 'field' }, h('label', { for: 'entry-note' }, 'Hinweis (optional)'), note, counter),
+    error,
+    submit,
+  );
+  const dialog = openDialog('Meine Adresse editieren', form);
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    error.textContent = '';
+    const selected = autocomplete.getSelected();
+    if (!selected) {
+      error.textContent = 'Bitte wähle deine Adresse aus der Vorschlagsliste aus.';
+      autocomplete.input.focus();
+      return;
+    }
+    submit.disabled = true;
+    submit.textContent = 'Speichern …';
+    const noteValue = note.value.trim() || null;
+    try {
+      const ok = await updateOwnEntry(entry.id, token, {
+        address_label: selected.label,
+        lat: selected.lat,
+        lng: selected.lng,
+        note: noteValue,
+      });
+      if (!ok) throw new Error('Token passt nicht zum Eintrag');
+      dialog.close();
+      onUpdated({ ...entry, address_label: selected.label, lat: selected.lat, lng: selected.lng, note: noteValue });
+    } catch (err) {
+      console.error('Eintrag konnte nicht gespeichert werden', err);
+      error.textContent =
+        err instanceof SupabaseRpcError && err.code === INVALID_PARAMETER_CODE
+          ? 'Die Adresse wurde vom Server abgelehnt. Bitte wähle sie erneut aus der Vorschlagsliste.'
+          : 'Der Eintrag konnte nicht gespeichert werden. Bitte versuche es später erneut.';
+      submit.disabled = false;
+      submit.textContent = 'Speichern';
+    }
+  });
 }

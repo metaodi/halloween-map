@@ -22,10 +22,20 @@ export interface MapHandle {
 export interface MapOptions {
   /** Liefert zusätzliche Inhalte (z. B. «Meinen Eintrag löschen») für das Popup eines Eintrags. */
   popupExtras?: (entry: Entry) => Node | null;
+  /** Eigene Einträge werden mit einem grünen Kürbis dargestellt. */
+  isOwn?: (entry: Entry) => boolean;
 }
 
 const pumpkinIcon = L.divIcon({
   className: 'pumpkin-marker',
+  html: '<span aria-hidden="true">🎃</span>',
+  iconSize: [44, 44],
+  iconAnchor: [22, 22],
+  popupAnchor: [0, -18],
+});
+
+const ownPumpkinIcon = L.divIcon({
+  className: 'pumpkin-marker own',
   html: '<span aria-hidden="true">🎃</span>',
   iconSize: [44, 44],
   iconAnchor: [22, 22],
@@ -104,7 +114,8 @@ export function createMap(container: HTMLElement, village: Village, options: Map
       markers.clear();
       for (const entry of entries) {
         const marker = L.marker([entry.lat, entry.lng], {
-          icon: pumpkinIcon,
+          icon: options.isOwn?.(entry) ? ownPumpkinIcon : pumpkinIcon,
+          zIndexOffset: options.isOwn?.(entry) ? 1000 : 0,
           title: entry.address_label,
           alt: `Trick-or-Treat bei ${entry.address_label}`,
         });
