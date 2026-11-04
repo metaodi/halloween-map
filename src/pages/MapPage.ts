@@ -44,11 +44,7 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
     showToast('Dein Eintrag wurde gelöscht.');
   }
 
-  // Prototyp: ?nebel=1 (weicher Rand), ?nebel=2 (Nebelschwaden, Default), ?nebel=linie (bisherige Linie)
-  const nebel = new URLSearchParams(location.search).get('nebel');
-  const boundsStyle = nebel === '1' ? 'fog' : nebel === 'linie' ? 'outline' : 'mist';
   const map = createMap(mapEl, village, {
-    boundsStyle,
     isOwn: (entry) => Boolean(tokenFor(entry.id)),
     // Eigene Einträge (Token in diesem Browser bekannt) bekommen im Popup einen Löschen-Button
     popupExtras(entry) {
