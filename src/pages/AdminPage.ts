@@ -172,7 +172,7 @@ async function renderDashboard(root: HTMLElement): Promise<void> {
   );
 
   const startVillage = villages[0];
-  const map: MapHandle = createMap(mapEl, startVillage);
+  const map: MapHandle = createMap(mapEl, startVillage, { boundsStyle: 'outline' });
   map.setBounds(null); // erst bei Auswahl eines Orts anzeigen
 
   function slugs(): string[] {

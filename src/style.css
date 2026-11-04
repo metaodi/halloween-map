@@ -196,3 +196,23 @@ html { scroll-behavior: smooth; }
 @keyframes message-new { from { background: #fef3c7; } }
 .message.new { animation: message-new 3s ease-out; }
 @media (prefers-reduced-motion: reduce) { .message.new { animation: none; outline: 2px solid #f59e0b; } }
+
+/* Nebel ausserhalb des Orts (siehe BoundsStyle in components/map.ts): zwei Schichten,
+   die gegeneinander überblendet und leicht verschoben werden. Nur opacity/transform,
+   damit der Browser die gefilterten Ebenen nicht neu rechnen muss. */
+.leaflet-pane.village-mist-pane {
+  z-index: 350; pointer-events: none; will-change: opacity, transform;
+  animation: mist-drift-a 23s ease-in-out infinite alternate;
+}
+.leaflet-pane.leaflet-village-mist-b-pane { animation-name: mist-drift-b; animation-duration: 29s; }
+@keyframes mist-drift-a {
+  from { opacity: 1;    transform: translate(0, 0); }
+  to   { opacity: 0.45; transform: translate(14px, -8px); }
+}
+@keyframes mist-drift-b {
+  from { opacity: 0.45; transform: translate(0, 0); }
+  to   { opacity: 1;    transform: translate(-12px, 10px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .leaflet-pane.village-mist-pane { animation: none; opacity: 0.8; }
+}
