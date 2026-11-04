@@ -196,3 +196,7 @@ html { scroll-behavior: smooth; }
 @keyframes message-new { from { background: #fef3c7; } }
 .message.new { animation: message-new 3s ease-out; }
 @media (prefers-reduced-motion: reduce) { .message.new { animation: none; outline: 2px solid #f59e0b; } }
+
+/* Ortsgrenze auf der Karte (siehe BoundsStyle in components/map.ts) */
+.village-fog-blur { filter: blur(28px); }
+.village-mist { filter: url(#village-mist-filter); }
