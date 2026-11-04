@@ -202,16 +202,16 @@ html { scroll-behavior: smooth; }
    damit der Browser die gefilterten Ebenen nicht neu rechnen muss. */
 .leaflet-pane.village-mist-pane {
   z-index: 350; pointer-events: none; will-change: opacity, transform;
-  animation: mist-drift-a 23s ease-in-out infinite alternate;
+  animation: mist-drift-a 11s ease-in-out infinite alternate;
 }
-.leaflet-pane.leaflet-village-mist-b-pane { animation-name: mist-drift-b; animation-duration: 29s; }
+.leaflet-pane.leaflet-village-mist-b-pane { animation-name: mist-drift-b; animation-duration: 14s; }
 @keyframes mist-drift-a {
   from { opacity: 1;    transform: translate(0, 0); }
-  to   { opacity: 0.45; transform: translate(14px, -8px); }
+  to   { opacity: 0.25; transform: translate(36px, -20px); }
 }
 @keyframes mist-drift-b {
-  from { opacity: 0.45; transform: translate(0, 0); }
-  to   { opacity: 1;    transform: translate(-12px, 10px); }
+  from { opacity: 0.25; transform: translate(0, 0); }
+  to   { opacity: 1;    transform: translate(-30px, 26px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .leaflet-pane.village-mist-pane { animation: none; opacity: 0.8; }

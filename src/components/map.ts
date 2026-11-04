@@ -66,11 +66,6 @@ const MIST_LAYERS = [
 
 /** Maximale Verschiebung des Rands durch den Filter (scale / 2) */
 const MIST_WARP_PX = 70;
-/**
- * Um so viele Pixel wird das Loch über die bbox hinaus vergrössert, damit der ausgefranste Rand
- * (Verschiebung + Weichzeichner + CSS-Drift) nicht in den Ort hineinreicht.
- */
-const MIST_MARGIN_PX = MIST_WARP_PX + 20;
 
 /**
  * SVG-Filter für die Nebelschwaden, einmal pro Dokument. Der Filter arbeitet in Layer-Pixeln:
@@ -123,18 +118,11 @@ export function createMap(container: HTMLElement, village: Village, options: Map
   // Gebiet ausserhalb der bbox abdunkeln: Weltrechteck mit Loch in Form der bbox
   const boundsStyle = options.boundsStyle ?? 'mist';
   const world: L.LatLngTuple[] = [[-90, -180], [-90, 180], [90, 180], [90, -180]];
-  let currentBBox: Village['bbox'] | null = null;
   let boundsLayers: L.Polygon[] = [];
 
-  /** Loch der bbox; beim Nebel um MIST_MARGIN_PX (beim aktuellen Zoom) vergrössert */
-  function holeRing(bbox: Village['bbox']): L.LatLngTuple[] {
-    const [minLng, minLat, maxLng, maxLat] = bbox;
-    if (boundsStyle === 'outline') return [[minLat, minLng], [minLat, maxLng], [maxLat, maxLng], [maxLat, minLng]];
-    const z = map.getZoom();
-    const m = MIST_MARGIN_PX;
-    const sw = map.unproject(map.project([minLat, minLng], z).add([-m, m]), z);
-    const ne = map.unproject(map.project([maxLat, maxLng], z).add([m, -m]), z);
-    return [[sw.lat, sw.lng], [sw.lat, ne.lng], [ne.lat, ne.lng], [ne.lat, sw.lng]];
+  /** Loch in Form der bbox. Beim Nebel franst der Rand bewusst auch etwas in den Ort hinein. */
+  function holeRing([minLng, minLat, maxLng, maxLat]: Village['bbox']): L.LatLngTuple[] {
+    return [[minLat, minLng], [minLat, maxLng], [maxLat, maxLng], [maxLat, minLng]];
   }
 
   const mistRenderers: L.Renderer[] = [];
@@ -146,16 +134,11 @@ export function createMap(container: HTMLElement, village: Village, options: Map
       pane.classList.add('village-mist-pane');
       mistRenderers.push(L.svg({ pane: l.name, padding: 0.5 }));
     }
-    // Der Rand in Pixeln hängt vom Zoom ab
-    map.on('zoomend', () => {
-      if (currentBBox) for (const p of boundsLayers) p.setLatLngs([world, holeRing(currentBBox)]);
-    });
   }
 
   function setBounds(v: Pick<Village, 'bbox'> | null) {
     for (const p of boundsLayers) p.remove();
     boundsLayers = [];
-    currentBBox = v?.bbox ?? null;
     if (!v) return;
     const rings = [world, holeRing(v.bbox)];
     if (boundsStyle === 'outline') {
