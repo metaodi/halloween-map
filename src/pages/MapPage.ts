@@ -20,7 +20,16 @@ export function renderMapPage(root: HTMLElement, village: Village, deleteToken?:
   const header = h(
     'header',
     { class: 'topbar' },
-    h('h1', {}, `🎃 ${village.name}`),
+    h(
+      'h1',
+      {},
+      h(
+        'a',
+        { href: `${import.meta.env.BASE_URL}?gemeinden`, title: 'Alle Gemeinden', 'aria-label': 'Alle Gemeinden', style: 'text-decoration:none' },
+        '🎃',
+      ),
+      ` ${village.name}`,
+    ),
     village.welcomeText ? h('p', {}, village.welcomeText) : null,
     villageNotice(village),
   );

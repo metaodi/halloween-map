@@ -28,6 +28,7 @@ body { background: var(--bg); }
   pointer-events: none;
 }
 .topbar h1 { margin: 0; font-size: 1.2rem; }
+.topbar h1 a { pointer-events: auto; display: inline-block; padding: 4px 6px; margin: -4px 0 -4px -6px; }
 .topbar p { margin: 2px 0 0; font-size: 0.85rem; color: #e5defa; }
 
 /* Hinweis einer Gemeinde (Karte, Formular, Info) */
